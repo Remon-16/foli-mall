@@ -1,3 +1,62 @@
 spring:
   application:
     name: foli-backend
+  # H2 内存数据库 MySQL兼容模式 in-memory database with MySQL compatibility
+  datasource:
+    url: jdbc:h2:mem:foli_mall;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  # H2 Web 控制台 console (dev only, access at /h2-console)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  # SQL 初始化 schema & data initialization
+  sql:
+    init:
+      mode: always
+      schema-locations: file:../sql/schema.sql
+  # 文件上传 file upload
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+# MyBatis-Plus 配置
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: ASSIGN_ID   # 雪花ID Snowflake ID
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    # 开发环境打印SQL log SQL in dev
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+# Knife4j / SpringDoc OpenAPI 3.0 配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+
+# JWT 配置
+jwt:
+  secret: foli-mall-secret-key-2026-please-change-in-production-environment
+  expiration: 86400000   # 24小时 24 hours
+
+# 应用自定义配置 app custom config
+app:
+  upload:
+    path: ./uploads       # 图片上传本地路径 local image upload path
+
+server:
+  port: 8080

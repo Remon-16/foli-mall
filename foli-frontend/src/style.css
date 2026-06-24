@@ -1,0 +1,62 @@
+/* 全局样式 Global styles */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* 商品卡片 Product card */
+.product-card {
+  cursor: pointer;
+  transition: box-shadow 0.3s;
+}
+.product-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.product-card .ant-card-cover img {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* 价格样式 Price style */
+.price-text {
+  color: #ff4d4f;
+  font-size: 18px;
+  font-weight: bold;
+}
+.price-symbol {
+  font-size: 14px;
+}
+
+/* 消息气泡 Message bubbles */
+.message-bubble {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  word-wrap: break-word;
+}
+.message-sent {
+  background: #1890ff;
+  color: #fff;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+}
+.message-received {
+  background: #f0f0f0;
+  color: #333;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+}
+
+/* 页面标题 Page title */
+.page-title {
+  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: 600;
+}
