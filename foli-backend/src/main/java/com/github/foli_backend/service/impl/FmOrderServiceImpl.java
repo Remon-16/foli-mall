@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -193,11 +194,45 @@ public class FmOrderServiceImpl implements FmOrderService {
 
         Page<FmOrder> mpPage = orderMapper.selectPage(Page.of(page, pageSize), wrapper);
 
+        // 批量查询所有订单项
+        List<Long> orderIds = mpPage.getRecords().stream()
+                .map(FmOrder::getId)
+                .collect(Collectors.toList());
+
+        Map<Long, List<OrderItemVO>> itemsMap = Map.of();
+        if (!orderIds.isEmpty()) {
+            List<FmOrderItem> allItems = orderItemMapper.selectList(
+                    new LambdaQueryWrapper<FmOrderItem>()
+                            .in(FmOrderItem::getOrderId, orderIds));
+            itemsMap = allItems.stream()
+                    .collect(Collectors.groupingBy(
+                            FmOrderItem::getOrderId,
+                            Collectors.mapping(OrderItemVO::fromEntity, Collectors.toList())
+                    ));
+        }
+
+        // 批量查询所有店铺
+        List<Long> storeIds = mpPage.getRecords().stream()
+                .map(FmOrder::getStoreId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Long, String> storeNameMap = Map.of();
+        if (!storeIds.isEmpty()) {
+            storeNameMap = storeMapper.selectList(
+                    new LambdaQueryWrapper<FmStore>()
+                            .in(FmStore::getId, storeIds))
+                    .stream()
+                    .collect(Collectors.toMap(FmStore::getId, FmStore::getStoreName));
+        }
+
+        final Map<Long, List<OrderItemVO>> finalItemsMap = itemsMap;
+        final Map<Long, String> finalStoreNameMap = storeNameMap;
         List<OrderVO> voList = mpPage.getRecords().stream()
                 .map(order -> {
                     OrderVO vo = OrderVO.fromEntity(order);
-                    FmStore store = storeMapper.selectById(order.getStoreId());
-                    vo.setStoreName(store != null ? store.getStoreName() : null);
+                    vo.setItems(finalItemsMap.getOrDefault(order.getId(), List.of()));
+                    vo.setStoreName(finalStoreNameMap.getOrDefault(order.getStoreId(), null));
                     return vo;
                 })
                 .collect(Collectors.toList());

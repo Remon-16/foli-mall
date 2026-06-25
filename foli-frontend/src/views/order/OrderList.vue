@@ -17,24 +17,24 @@ const activeTab = ref('all')
 const searchParams = reactive({
   page: 1,
   pageSize: 10,
-  status: undefined as string | undefined,
+  status: undefined as number | undefined,
 })
 
 const statusTabs = [
   { key: 'all', label: () => t('common.all') },
-  { key: 'pending_pay', label: () => t('order.statusPendingPay') },
-  { key: 'paid', label: () => t('order.statusPaid') },
-  { key: 'shipped', label: () => t('order.statusShipped') },
-  { key: 'completed', label: () => t('order.statusCompleted') },
-  { key: 'cancelled', label: () => t('order.statusCancelled') },
+  { key: '0', label: () => t('order.statusPendingPay') },
+  { key: '1', label: () => t('order.statusPaid') },
+  { key: '2', label: () => t('order.statusShipped') },
+  { key: '4', label: () => t('order.statusCompleted') },
+  { key: '5', label: () => t('order.statusCancelled') },
 ]
 
-const statusColorMap: Record<string, string> = {
-  pending_pay: 'orange',
-  paid: 'blue',
-  shipped: 'cyan',
-  completed: 'green',
-  cancelled: 'default',
+const statusColorMap: Record<number, string> = {
+  0: 'orange',
+  1: 'blue',
+  2: 'cyan',
+  4: 'green',
+  5: 'default',
 }
 
 onMounted(() => {
@@ -48,7 +48,7 @@ async function fetchOrders() {
       page: searchParams.page,
       pageSize: searchParams.pageSize,
     }
-    if (searchParams.status && searchParams.status !== 'all') {
+    if (searchParams.status !== undefined) {
       params.status = searchParams.status
     }
     const res = await service.get('/orders', { params })
@@ -64,7 +64,7 @@ async function fetchOrders() {
 
 function handleTabChange(key: string) {
   activeTab.value = key
-  searchParams.status = key
+  searchParams.status = key === 'all' ? undefined : Number(key)
   searchParams.page = 1
   fetchOrders()
 }
@@ -78,15 +78,15 @@ function goToDetail(id: string) {
   router.push(`/orders/${id}`)
 }
 
-function getStatusText(status: string): string {
-  const map: Record<string, string> = {
-    pending_pay: t('order.statusPendingPay'),
-    paid: t('order.statusPaid'),
-    shipped: t('order.statusShipped'),
-    completed: t('order.statusCompleted'),
-    cancelled: t('order.statusCancelled'),
+function getStatusText(status: number): string {
+  const map: Record<number, string> = {
+    0: t('order.statusPendingPay'),
+    1: t('order.statusPaid'),
+    2: t('order.statusShipped'),
+    4: t('order.statusCompleted'),
+    5: t('order.statusCancelled'),
   }
-  return map[status] || status
+  return map[status] || String(status)
 }
 
 async function handlePay(order: OrderVO) {
@@ -183,7 +183,7 @@ async function handleConfirmReceive(order: OrderVO) {
           <!-- Order items preview -->
           <div class="order-items">
             <div
-              v-for="item in order.items.slice(0, 3)"
+              v-for="item in (order.items || []).slice(0, 3)"
               :key="item.id"
               class="order-item"
             >
@@ -198,8 +198,8 @@ async function handleConfirmReceive(order: OrderVO) {
               </div>
               <span class="order-item-price">¥{{ item.price }}</span>
             </div>
-            <div v-if="order.items.length > 3" class="more-items">
-              ... and {{ order.items.length - 3 }} more items
+            <div v-if="(order.items || []).length > 3" class="more-items">
+              ... and {{ (order.items || []).length - 3 }} more items
             </div>
           </div>
 
@@ -213,7 +213,7 @@ async function handleConfirmReceive(order: OrderVO) {
               </span>
               <a-space :size="8">
                 <a-button
-                  v-if="order.status === 'pending_pay'"
+                  v-if="order.status === 0"
                   type="primary"
                   size="small"
                   @click.stop="handlePay(order)"
@@ -221,14 +221,14 @@ async function handleConfirmReceive(order: OrderVO) {
                   {{ t('order.pay') }}
                 </a-button>
                 <a-button
-                  v-if="order.status === 'pending_pay'"
+                  v-if="order.status === 0"
                   size="small"
                   @click.stop="handleCancel(order)"
                 >
                   {{ t('order.cancel') }}
                 </a-button>
                 <a-button
-                  v-if="order.status === 'shipped'"
+                  v-if="order.status === 2"
                   type="primary"
                   size="small"
                   @click.stop="handleConfirmReceive(order)"
@@ -243,12 +243,11 @@ async function handleConfirmReceive(order: OrderVO) {
     </a-spin>
 
     <!-- Pagination -->
-    <div v-if="total > 0" class="pagination-wrapper">
+    <div v-if="Number(total) > 0" class="pagination-wrapper">
       <a-pagination
         :current="searchParams.page"
-        :total="total"
+        :total="Number(total)"
         :page-size="searchParams.pageSize"
-        :show-total="(total: number) => t('common.total', { total })"
         @change="handlePageChange"
       />
     </div>
