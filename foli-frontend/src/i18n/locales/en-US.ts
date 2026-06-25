@@ -168,6 +168,10 @@ export default {
     noMessages: 'No messages',
     unreadCount: '{count} unread',
     markRead: 'Mark as Read',
+    contactSeller: 'Contact Seller',
+    contactAdmin: 'Contact Admin',
+    contactComplainant: 'Contact Complainant',
+    newConversation: 'New Conversation',
   },
   complaint: {
     title: 'Complaints',

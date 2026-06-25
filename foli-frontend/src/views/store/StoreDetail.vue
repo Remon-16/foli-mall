@@ -5,7 +5,12 @@
       <div class="store-header" v-if="store">
         <a-descriptions :title="t('store.storeDetail')" bordered :column="{ xs: 1, sm: 2 }">
           <a-descriptions-item :label="t('store.storeName')">{{ store.storeName }}</a-descriptions-item>
-          <a-descriptions-item :label="t('store.ownerNickname')">{{ store.ownerNickname }}</a-descriptions-item>
+          <a-descriptions-item :label="t('store.ownerNickname')">
+            {{ store.ownerNickname }}
+            <a-button type="link" size="small" v-if="currentUserId !== store.userId" @click="contactSeller">
+              {{ t('message.contactSeller') }}
+            </a-button>
+          </a-descriptions-item>
           <a-descriptions-item :label="t('store.storeDescription')" :span="2">{{ store.description }}</a-descriptions-item>
           <a-descriptions-item :label="t('store.storeStatus')">
             <a-tag :color="store.status === 1 ? 'green' : store.status === 0 ? 'orange' : 'red'">
@@ -55,19 +60,29 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import service from '@/api'
+import { useAuthStore } from '@/stores/auth'
 import type { StoreVO, ProductVO, PageResult } from '@/types'
 
 const { t } = useI18n()
 const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
 
+const currentUserId = authStore.userInfo?.id ?? ''
 const loading = ref(false)
 const store = ref<StoreVO | null>(null)
 const products = ref<ProductVO[]>([])
 const productTotal = ref(0)
 const productPagination = reactive({ page: 1, pageSize: 12 })
+
+function contactSeller() {
+  if (store.value) {
+    router.push(`/messages/new?receiverId=${store.value.userId}&receiverName=${encodeURIComponent(store.value.ownerNickname)}`)
+  }
+}
 
 function storeStatusText(status: number): string {
   const map: Record<number, string> = {

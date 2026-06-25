@@ -61,6 +61,12 @@
             {{ complaintStatusText(currentComplaint.status) }}
           </a-tag>
         </a-descriptions-item>
+        <a-descriptions-item :label="t('auth.username')">
+          {{ currentComplaint.userName }}
+          <a-button type="link" size="small" @click="contactComplainant">
+            {{ t('message.contactComplainant') }}
+          </a-button>
+        </a-descriptions-item>
       </a-descriptions>
 
       <a-divider />
@@ -82,12 +88,14 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { message } from 'ant-design-vue'
 import service from '@/api'
 import type { ComplaintVO, PageResult } from '@/types'
 
 const { t } = useI18n()
+const router = useRouter()
 
 const loading = ref(false)
 const complaints = ref<ComplaintVO[]>([])
@@ -158,6 +166,12 @@ function handleTableChange(pag: { current: number; pageSize: number }) {
   pagination.page = pag.current
   pagination.pageSize = pag.pageSize
   fetchComplaints()
+}
+
+function contactComplainant() {
+  if (currentComplaint.value) {
+    router.push(`/messages/new?receiverId=${currentComplaint.value.userId}&receiverName=${encodeURIComponent(currentComplaint.value.userName)}`)
+  }
 }
 
 function openDetailModal(record: ComplaintVO) {

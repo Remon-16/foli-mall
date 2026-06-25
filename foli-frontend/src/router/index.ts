@@ -37,6 +37,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'account', name: 'Account', component: () => import('@/views/account/AccountView.vue'), meta: { title: '账户 Account' } },
       { path: 'returns', name: 'ReturnList', component: () => import('@/views/return/ReturnList.vue'), meta: { title: '退货退款 Returns' } },
       { path: 'messages', name: 'MessageList', component: () => import('@/views/message/MessageList.vue'), meta: { title: '消息 Messages' } },
+      { path: 'messages/new', name: 'NewConversation', component: () => import('@/views/message/ConversationView.vue'), meta: { title: '新建会话 New Chat' } },
       { path: 'messages/:conversationId', name: 'Conversation', component: () => import('@/views/message/ConversationView.vue'), meta: { title: '会话 Chat' } },
       { path: 'complaints', name: 'ComplaintList', component: () => import('@/views/complaint/ComplaintList.vue'), meta: { title: '投诉 Complaints' } },
     ],

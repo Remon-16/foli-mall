@@ -22,6 +22,11 @@
             {{ complaintStatusText(record.status) }}
           </a-tag>
         </template>
+        <template v-if="column.key === 'actions'">
+          <a-button type="link" size="small" v-if="record.handlerId" @click="contactAdmin(record)">
+            {{ t('message.contactAdmin') }}
+          </a-button>
+        </template>
       </template>
     </a-table>
 
@@ -77,12 +82,14 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { message } from 'ant-design-vue'
 import service from '@/api'
 import type { ComplaintVO, StoreVO, PageResult } from '@/types'
 
 const { t } = useI18n()
+const router = useRouter()
 
 const loading = ref(false)
 const records = ref<ComplaintVO[]>([])
@@ -95,6 +102,7 @@ const columns = [
   { title: t('complaint.targetStore'), key: 'storeName', dataIndex: 'storeName' },
   { title: t('return.status'), key: 'status' },
   { title: t('time'), key: 'createTime', dataIndex: 'createTime' },
+  { title: t('common.actions'), key: 'actions' },
 ]
 
 const fileModalOpen = ref(false)
@@ -109,6 +117,10 @@ const fileForm = reactive({
   orderId: '' as string | number,
   productId: '' as string | number,
 })
+
+function contactAdmin(record: ComplaintVO) {
+  router.push(`/messages/new?receiverId=${record.handlerId}&receiverName=${encodeURIComponent(t('admin.roleAdmin'))}`)
+}
 
 function complaintTypeText(type: string): string {
   const map: Record<string, string> = {

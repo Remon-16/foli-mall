@@ -168,6 +168,10 @@ export default {
     noMessages: '暂无消息',
     unreadCount: '{count}条未读',
     markRead: '标记已读',
+    contactSeller: '联系店主',
+    contactAdmin: '联系管理员',
+    contactComplainant: '联系投诉人',
+    newConversation: '新建会话',
   },
   complaint: {
     title: '投诉',

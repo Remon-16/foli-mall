@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { message } from 'ant-design-vue'
 import service from '@/api'
@@ -49,6 +49,7 @@ import type { MessageVO, ConversationVO } from '@/types'
 
 const { t } = useI18n()
 const route = useRoute()
+const router = useRouter()
 const authStore = useAuthStore()
 
 const loading = ref(false)
@@ -58,6 +59,7 @@ const messagesContainer = ref<HTMLElement | null>(null)
 const currentUserId = ref<string>(authStore.userInfo?.id ?? '')
 const otherUserName = ref('')
 const receiverId = ref<string>('')
+const isNewConversation = ref(false)
 
 async function fetchMessages() {
   const conversationId = route.params.conversationId as string
@@ -98,8 +100,15 @@ async function sendMessage() {
     return
   }
   try {
-    await service.post('/messages', { receiverId: receiverId.value, content })
+    const res = await service.post('/messages', { receiverId: receiverId.value, content })
     inputMessage.value = ''
+    if (isNewConversation.value) {
+      const sent = res.data.data as MessageVO
+      if (sent.conversationId) {
+        router.replace(`/messages/${sent.conversationId}`)
+        return
+      }
+    }
     await fetchMessages()
     await nextTick()
     scrollToBottom()
@@ -120,9 +129,18 @@ watch(messages, async () => {
 })
 
 onMounted(async () => {
-  await fetchMessages()
-  await nextTick()
-  scrollToBottom()
+  const queryReceiverId = route.query.receiverId as string | undefined
+  const queryReceiverName = route.query.receiverName as string | undefined
+
+  if (queryReceiverId) {
+    isNewConversation.value = true
+    receiverId.value = queryReceiverId
+    otherUserName.value = queryReceiverName || ''
+  } else {
+    await fetchMessages()
+    await nextTick()
+    scrollToBottom()
+  }
 })
 </script>
 

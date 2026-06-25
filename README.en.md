@@ -56,7 +56,7 @@ cd foli-backend
 After startup, visit:
 
 - API docs (Knife4j): <http://localhost:8080/doc.html>
-- H2 Console: <http://localhost:8080/h2-console>
+- H2 Console: <http://localhost:8080/h2-console> (**Note: You must change the JDBC URL to `jdbc:h2:mem:foli_mall`**, username `sa`, no password. Or use this [quick link](http://localhost:8080/h2-console?url=jdbc:h2:mem:foli_mall) to pre-fill the JDBC URL)
 
 ### Frontend (requires Node.js 18+)
 

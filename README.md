@@ -56,7 +56,7 @@ cd foli-backend
 启动后访问：
 
 - API 文档（Knife4j）：<http://localhost:8080/doc.html>
-- H2 控制台：<http://localhost:8080/h2-console>
+- H2 控制台：<http://localhost:8080/h2-console>（**注意：登录时需将 JDBC URL 改为 `jdbc:h2:mem:foli_mall`**，用户名 `sa`，密码留空。可使用[快捷链接](http://localhost:8080/h2-console?url=jdbc:h2:mem:foli_mall)自动填写 JDBC URL）
 
 ### 前端（需要 Node.js 18+）
 
