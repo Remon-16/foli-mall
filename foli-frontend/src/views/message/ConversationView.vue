@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { message } from 'ant-design-vue'
@@ -56,7 +56,7 @@ const loading = ref(false)
 const messages = ref<MessageVO[]>([])
 const inputMessage = ref('')
 const messagesContainer = ref<HTMLElement | null>(null)
-const currentUserId = ref<string>(authStore.userInfo?.id ?? '')
+const currentUserId = computed(() => authStore.userInfo?.id ?? '')
 const otherUserName = ref('')
 const receiverId = ref<string>('')
 const isNewConversation = ref(false)
@@ -105,7 +105,11 @@ async function sendMessage() {
     if (isNewConversation.value) {
       const sent = res.data.data as MessageVO
       if (sent.conversationId) {
-        router.replace(`/messages/${sent.conversationId}`)
+        isNewConversation.value = false
+        await router.replace(`/messages/${sent.conversationId}`)
+        await fetchMessages()
+        await nextTick()
+        scrollToBottom()
         return
       }
     }

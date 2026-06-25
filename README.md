@@ -73,11 +73,11 @@ npm run dev
 | 用户名 | 密码 | 角色 | 账户余额 |
 | ------ | ------ | ------ | -------- |
 | admin | admin123 | 管理员 | 99999 |
-| seller01 | seller123 | 卖家 | 50000 |
-| seller02 | seller123 | 卖家 | 50000 |
-| seller03 | seller123 | 卖家 | 50000 |
-| seller04 | seller123 | 卖家 | 50000 |
-| seller05 | seller123 | 卖家 | 50000 |
+| seller01 | seller123 | 卖家 - 数码达人 | 50000 |
+| seller02 | seller123 | 卖家 - 时尚掌柜 | 50000 |
+| seller03 | seller123 | 卖家 - 美食专家 | 50000 |
+| seller04 | seller123 | 卖家 - 家居买手 | 50000 |
+| seller05 | seller123 | 卖家 - 运动达人 | 50000 |
 | buyer01 | buyer123 | 买家 | 10000 |
 | buyer02 | buyer123 | 买家 | 10000 |
 

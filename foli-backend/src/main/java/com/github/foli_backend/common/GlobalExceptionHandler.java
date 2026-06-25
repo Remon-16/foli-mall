@@ -1,6 +1,9 @@
 package com.github.foli_backend.common;
 
 import com.github.foli_backend.constant.BizCodeEnum;
+
+import io.swagger.v3.oas.annotations.Hidden;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,6 +18,7 @@ import java.util.stream.Collectors;
  * 全局异常处理器 Global exception handler
  * HTTP状态码反映协议层结果；业务错误码在响应体中
  */
+@Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

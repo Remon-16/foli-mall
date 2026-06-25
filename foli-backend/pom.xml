@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.15</version>
+		<version>3.5.4</version>
 		<relativePath/>
 	</parent>
 	<groupId>com.github</groupId>
@@ -53,10 +53,10 @@
 		</dependency>
 		<!-- Knife4j API 文档 OpenAPI 3.0 Jakarta API documentation -->
 		<dependency>
-			<groupId>com.github.xiaoymin</groupId>
-			<artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-			<version>4.5.0</version>
-		</dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+            <version>4.5.0</version>
+        </dependency>
 		<!-- JWT 认证 authentication -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

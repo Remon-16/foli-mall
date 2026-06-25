@@ -73,11 +73,11 @@ After startup, visit: <http://localhost:5173>
 | Username | Password | Role | Balance |
 | -------- | -------- | ---- | ------- |
 | admin | admin123 | Admin | 99999 |
-| seller01 | seller123 | Seller | 50000 |
-| seller02 | seller123 | Seller | 50000 |
-| seller03 | seller123 | Seller | 50000 |
-| seller04 | seller123 | Seller | 50000 |
-| seller05 | seller123 | Seller | 50000 |
+| seller01 | seller123 | Seller - Digital Expert | 50000 |
+| seller02 | seller123 | Seller - Fashion Manager | 50000 |
+| seller03 | seller123 | Seller - Food Expert | 50000 |
+| seller04 | seller123 | Seller - Home Buyer | 50000 |
+| seller05 | seller123 | Seller - Sports Enthusiast | 50000 |
 | buyer01 | buyer123 | Buyer | 10000 |
 | buyer02 | buyer123 | Buyer | 10000 |
 
