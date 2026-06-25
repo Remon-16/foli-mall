@@ -188,6 +188,57 @@ Project requirements and design documents are located in the `docs/` directory, 
 - `docs/zh-CN/` — Chinese documentation
 - `docs/en-US/` — English documentation
 
+## Testing
+
+The project includes comprehensive unit and integration tests covering all 11 Service implementations and key Controller classes.
+
+### Running Tests
+
+```bash
+cd foli-backend
+./mvnw test
+```
+
+### Testing Tech Stack
+
+| Technology | Purpose |
+| ---------- | ------- |
+| JUnit 5 | Testing framework |
+| Mockito | Dependency mocking (including `mockStatic` for static methods) |
+| AssertJ | Fluent assertions |
+| `@WebMvcTest` | Controller-layer integration tests |
+| `@ExtendWith(MockitoExtension.class)` | Service-layer unit tests |
+
+### Test Coverage
+
+| Layer | Test Class | Method Count |
+| ----- | ---------- | ------------ |
+| Service | FmOrderServiceImplTest | 37 |
+| Service | FmReturnRefundServiceImplTest | 25 |
+| Service | FmStoreServiceImplTest | 16 |
+| Service | FmProductServiceImplTest | 14 |
+| Service | FmCartItemServiceImplTest | 13 |
+| Service | AccountServiceImplTest | 10 |
+| Service | FmUserServiceImplTest | 8 |
+| Service | FmMessageServiceImplTest | 6 |
+| Service | FmComplaintServiceImplTest | 5 |
+| Service | FmProductCategoryServiceImplTest | 5 |
+| Service | FileServiceImplTest | 6 |
+| Controller | AuthControllerTest | 4 |
+| Controller | OrderControllerTest | 6 |
+| Controller | AccountControllerTest | 3 |
+
+### Test Dimensions
+
+- **Happy path**: Successful execution of primary business flows
+- **Boundary conditions**: null values, empty collections, zero values, edge cases
+- **Exception paths**: Business exceptions (`BizCodeEnum`), state machine validation failures
+- **Concurrency & idempotency**: Optimistic lock failures (`update` returning 0), duplicate operation prevention
+
+### Test Helpers
+
+`src/test/java/com/github/foli_backend/helper/TestDataFactory.java` — provides static factory methods for all entities, ensuring consistent test data construction.
+
 ## License
 
 This project is open-sourced under the [MIT](./LICENSE) license.

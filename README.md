@@ -188,6 +188,57 @@ H2 控制台：<http://localhost:8080/h2-console>（JDBC URL: `jdbc:h2:mem:foli_
 - `docs/zh-CN/` — 中文文档
 - `docs/en-US/` — 英文文档
 
+## 测试
+
+项目包含完整的单元测试和集成测试，覆盖所有 Service 层（11 个实现类）和关键 Controller 层。
+
+### 运行测试
+
+```bash
+cd foli-backend
+./mvnw test
+```
+
+### 测试技术栈
+
+| 技术 | 用途 |
+| ---- | ---- |
+| JUnit 5 | 测试框架 |
+| Mockito | Mock 依赖（含 `mockStatic` 静态方法模拟） |
+| AssertJ | 流畅断言 |
+| `@WebMvcTest` | Controller 层集成测试 |
+| `@ExtendWith(MockitoExtension.class)` | Service 层单元测试 |
+
+### 测试覆盖
+
+| 层级 | 测试类 | 测试方法数 |
+| ---- | ------ | ----------- |
+| Service | FmOrderServiceImplTest | 37 |
+| Service | FmReturnRefundServiceImplTest | 25 |
+| Service | FmStoreServiceImplTest | 16 |
+| Service | FmProductServiceImplTest | 14 |
+| Service | FmCartItemServiceImplTest | 13 |
+| Service | AccountServiceImplTest | 10 |
+| Service | FmUserServiceImplTest | 8 |
+| Service | FmMessageServiceImplTest | 6 |
+| Service | FmComplaintServiceImplTest | 5 |
+| Service | FmProductCategoryServiceImplTest | 5 |
+| Service | FileServiceImplTest | 6 |
+| Controller | AuthControllerTest | 4 |
+| Controller | OrderControllerTest | 6 |
+| Controller | AccountControllerTest | 3 |
+
+### 测试维度
+
+- **正常路径**：主要业务流程成功场景
+- **边界条件**：null 值、空集合、零值、极限值
+- **异常路径**：业务异常（BizCodeEnum）、状态机校验失败
+- **并发/幂等**：乐观锁失败（`update` 返回 0）、重复操作拦截
+
+### 测试辅助类
+
+`src/test/java/com/github/foli_backend/helper/TestDataFactory.java` — 提供所有实体的静态工厂方法，统一测试数据构建。
+
 ## 许可证
 
 本项目基于 [MIT](./LICENSE) 许可证开源。
