@@ -208,7 +208,7 @@ async function handleApply() {
   }
 }
 
-async function shipBack(id: number) {
+async function shipBack(id: string) {
   try {
     await service.put(`/returns/${id}/ship-back`)
     message.success(t('common.success'))

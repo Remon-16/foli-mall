@@ -22,7 +22,7 @@ service.interceptors.request.use((config) => {
 service.interceptors.response.use(
   (response) => {
     const res = response.data as ApiResult
-    if (res.code !== 200) {
+    if (res.code !== '100000') {
       message.error(res.message || 'Error')
       return Promise.reject(new Error(res.message || 'Error'))
     }

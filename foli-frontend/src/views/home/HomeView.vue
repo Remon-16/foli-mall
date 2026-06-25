@@ -78,7 +78,7 @@ function handlePageChange(page: number) {
   fetchProducts()
 }
 
-function goToProduct(id: number) {
+function goToProduct(id: string) {
   router.push(`/products/${id}`)
 }
 </script>

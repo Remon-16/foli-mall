@@ -16,7 +16,7 @@ spring:
   sql:
     init:
       mode: always
-      schema-locations: file:../sql/schema.sql
+      schema-locations: classpath:schema.sql
   # 文件上传 file upload
   servlet:
     multipart:

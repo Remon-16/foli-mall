@@ -185,7 +185,7 @@ RESTful API with unified response format:
 ### 6.1 Data Initialization
 
 On first startup:
-1. **Schema**: `sql/schema.sql` creates 12 tables
+1. **Schema**: `foli-backend/src/main/resources/schema.sql` creates 12 tables
 2. **Seed data**: `DataInitializer` writes 8 users, 22 categories, 5 stores, 60 products with images
 
 All passwords are BCrypt-hashed. IDs are dynamically generated via Snowflake algorithm.

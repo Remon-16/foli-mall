@@ -237,7 +237,7 @@ async function handleSubmit() {
   }
 }
 
-async function deleteProduct(id: number) {
+async function deleteProduct(id: string) {
   try {
     await service.delete(`/seller/products/${id}`)
     message.success(t('common.success'))
@@ -247,7 +247,7 @@ async function deleteProduct(id: number) {
   }
 }
 
-async function offShelf(id: number) {
+async function offShelf(id: string) {
   try {
     await service.put(`/seller/products/${id}/off-shelf`)
     message.success(t('common.success'))
@@ -257,7 +257,7 @@ async function offShelf(id: number) {
   }
 }
 
-async function onShelf(id: number) {
+async function onShelf(id: string) {
   try {
     await service.put(`/seller/products/${id}/on-shelf`)
     message.success(t('common.success'))

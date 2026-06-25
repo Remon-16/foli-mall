@@ -134,10 +134,6 @@ foli-mall/
 ├── docs/                          # Requirements and design documents
 │   ├── zh-CN/                     # Chinese documentation
 │   └── en-US/                     # English documentation
-├── sql/                           # Database schema and test data
-│   ├── schema.sql                 # DDL (12 tables)
-│   ├── data.sql                   # Test data
-│   └── image/                     # Sample product images
 └── LICENSE                        # MIT License
 ```
 
@@ -181,8 +177,8 @@ Uses H2 in-memory database in MySQL compatibility mode, auto-initialized on appl
 | fm_return_refund | Return & refund records |
 | fm_balance_log | Balance transaction logs |
 
-Schema: `sql/schema.sql`  
-Test data: `sql/data.sql`  
+Schema: `foli-backend/src/main/resources/schema.sql`  
+Seed data: auto-inserted by `DataInitializer` on startup (see `foli-backend/src/main/java/.../config/DataInitializer.java`)  
 H2 Console: <http://localhost:8080/h2-console> (JDBC URL: `jdbc:h2:mem:foli_mall`, Username: `sa`, no password)
 
 ## Documentation

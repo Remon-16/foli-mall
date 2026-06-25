@@ -134,10 +134,6 @@ foli-mall/
 ├── docs/                          # 需求及设计文档
 │   ├── zh-CN/                     # 中文文档
 │   └── en-US/                     # 英文文档
-├── sql/                           # 数据库建表及测试数据
-│   ├── schema.sql                 # 建表 DDL（12 张表）
-│   ├── data.sql                   # 测试数据
-│   └── image/                     # 示例商品图片
 └── LICENSE                        # MIT 许可证
 ```
 
@@ -181,8 +177,8 @@ foli-mall/
 | fm_return_refund | 退货退款表 |
 | fm_balance_log | 余额流水表 |
 
-建表脚本：`sql/schema.sql`  
-测试数据：`sql/data.sql`  
+建表脚本：`foli-backend/src/main/resources/schema.sql`  
+种子数据：应用启动时由 `DataInitializer` 自动写入（见 `foli-backend/src/main/java/.../config/DataInitializer.java`）  
 H2 控制台：<http://localhost:8080/h2-console>（JDBC URL: `jdbc:h2:mem:foli_mall`，用户名: `sa`，密码留空）
 
 ## 文档

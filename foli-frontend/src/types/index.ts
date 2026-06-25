@@ -2,7 +2,7 @@
 
 /** 通用API响应 Unified API response */
 export interface ApiResult<T = unknown> {
-  code: number
+  code: string
   message: string
   data: T
 }
@@ -17,7 +17,7 @@ export interface PageResult<T> {
 
 /** 用户信息 User info */
 export interface UserInfo {
-  id: number
+  id: string
   username: string
   nickname: string
   phone: string
@@ -32,7 +32,7 @@ export interface UserInfo {
 /** 登录响应 Login response */
 export interface LoginResult {
   token: string
-  userId: number
+  userId: string
   username: string
   nickname: string
   role: number
@@ -40,10 +40,10 @@ export interface LoginResult {
 
 /** 商品 Product */
 export interface ProductVO {
-  id: number
-  storeId: number
+  id: string
+  storeId: string
   storeName: string
-  categoryId: number
+  categoryId: string
   categoryName: string
   name: string
   description: string
@@ -61,8 +61,8 @@ export interface ProductDetailVO extends ProductVO {}
 
 /** 分类 Category */
 export interface CategoryVO {
-  id: number
-  parentId: number
+  id: string
+  parentId: string
   name: string
   icon: string
   sortOrder: number
@@ -71,8 +71,8 @@ export interface CategoryVO {
 
 /** 店铺 Store */
 export interface StoreVO {
-  id: number
-  userId: number
+  id: string
+  userId: string
   storeName: string
   storeLogo: string
   description: string
@@ -85,8 +85,8 @@ export interface StoreVO {
 
 /** 购物车项 Cart item */
 export interface CartItemVO {
-  id: number
-  productId: number
+  id: string
+  productId: string
   productName: string
   productImage: string
   price: number
@@ -97,9 +97,9 @@ export interface CartItemVO {
 
 /** 订单 Order */
 export interface OrderVO {
-  id: number
+  id: string
   orderNo: string
-  storeId: number
+  storeId: string
   storeName: string
   totalAmount: number
   status: number
@@ -115,8 +115,8 @@ export interface OrderVO {
 
 /** 订单项 Order item */
 export interface OrderItemVO {
-  id: number
-  productId: number
+  id: string
+  productId: string
   productName: string
   productImage: string
   price: number
@@ -125,11 +125,11 @@ export interface OrderItemVO {
 
 /** 消息 Message */
 export interface MessageVO {
-  id: number
+  id: string
   conversationId: string
-  senderId: number
+  senderId: string
   senderName: string
-  receiverId: number
+  receiverId: string
   receiverName: string
   content: string
   isRead: number
@@ -139,7 +139,7 @@ export interface MessageVO {
 /** 会话 Conversation */
 export interface ConversationVO {
   conversationId: string
-  otherUserId: number
+  otherUserId: string
   otherUserName: string
   lastMessage: string
   unreadCount: number
@@ -148,13 +148,13 @@ export interface ConversationVO {
 
 /** 退货退款 Return/Refund */
 export interface ReturnRefundVO {
-  id: number
+  id: string
   returnNo: string
-  orderId: number
+  orderId: string
   orderNo: string
-  userId: number
+  userId: string
   buyerNickname: string
-  storeId: number
+  storeId: string
   storeName: string
   returnReason: string
   returnType: number
@@ -170,20 +170,20 @@ export interface ReturnRefundVO {
 
 /** 投诉 Complaint */
 export interface ComplaintVO {
-  id: number
-  userId: number
+  id: string
+  userId: string
   userName: string
-  orderId: number | null
-  productId: number | null
-  storeId: number
+  orderId: string | null
+  productId: string | null
+  storeId: string
   storeName: string
-  returnId: number | null
+  returnId: string | null
   type: string
   title: string
   content: string
   evidenceImages: string
   status: number
-  handlerId: number | null
+  handlerId: string | null
   handleResult: string | null
   handleTime: string | null
   createTime: string
@@ -191,7 +191,7 @@ export interface ComplaintVO {
 
 /** 余额流水 Balance log */
 export interface BalanceLogVO {
-  id: number
+  id: string
   amount: number
   type: string
   orderNo: string

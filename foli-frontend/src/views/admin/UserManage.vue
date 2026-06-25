@@ -123,7 +123,7 @@ function handleTableChange(pag: { current: number; pageSize: number }) {
   fetchUsers()
 }
 
-async function toggleUserStatus(id: number, enabled: boolean) {
+async function toggleUserStatus(id: string, enabled: boolean) {
   try {
     await service.put(`/admin/users/${id}/status`, null, {
       params: { status: enabled ? 1 : 0 },

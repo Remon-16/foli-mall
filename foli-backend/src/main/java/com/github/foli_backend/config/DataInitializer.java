@@ -319,7 +319,7 @@ public class DataInitializer implements CommandLineRunner {
         product.setCategoryId(categoryId);
         product.setName(name);
         product.setDescription(description);
-        product.setMainImage("/sql/image/product-" + imageSuffix + ".jpg");
+        product.setMainImage("/images/product-" + imageSuffix + ".jpg");
         product.setPrice(BigDecimal.valueOf(price));
         product.setStock(stock);
         product.setStatus(ProductStatusEnum.APPROVED.getCode()); // 已审核通过 / approved
@@ -329,7 +329,7 @@ public class DataInitializer implements CommandLineRunner {
         // 创建商品主图 / Create product main image
         FmProductImage image = new FmProductImage();
         image.setProductId(product.getId());
-        image.setImageUrl("/sql/image/product-" + imageSuffix + ".jpg");
+        image.setImageUrl("/images/product-" + imageSuffix + ".jpg");
         image.setSortOrder(0);
         productImageMapper.insert(image);
 

@@ -109,7 +109,7 @@ function handleTableChange(pag: { current: number; pageSize: number }) {
   fetchStores()
 }
 
-function openReviewModal(id: number, status: number) {
+function openReviewModal(id: string, status: number) {
   reviewStoreId.value = id
   reviewStatus.value = status
   reviewComment.value = ''

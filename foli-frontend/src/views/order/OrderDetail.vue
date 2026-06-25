@@ -14,7 +14,7 @@ const order = ref<OrderVO | null>(null)
 const loading = ref(false)
 const actionLoading = ref(false)
 
-const orderId = Number(route.params.id)
+const orderId = route.params.id as string
 
 onMounted(() => {
   fetchOrder()

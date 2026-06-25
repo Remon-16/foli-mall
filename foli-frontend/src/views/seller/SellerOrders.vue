@@ -125,7 +125,7 @@ function handleTableChange(pag: { current: number; pageSize: number }) {
   fetchOrders()
 }
 
-async function shipOrder(id: number) {
+async function shipOrder(id: string) {
   try {
     await service.put(`/seller/orders/${id}/ship`)
     message.success(t('common.success'))

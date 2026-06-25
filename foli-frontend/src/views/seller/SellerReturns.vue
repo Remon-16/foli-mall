@@ -164,7 +164,7 @@ function handleTableChange(pag: { current: number; pageSize: number }) {
   fetchReturns()
 }
 
-async function approveReturn(id: number) {
+async function approveReturn(id: string) {
   try {
     await service.put(`/seller/returns/${id}/review`, { status: 1 })
     message.success(t('common.success'))
@@ -172,7 +172,7 @@ async function approveReturn(id: number) {
   } catch { /* ignore */ }
 }
 
-async function rejectReturn(id: number) {
+async function rejectReturn(id: string) {
   try {
     await service.put(`/seller/returns/${id}/review`, { status: 2 })
     message.success(t('common.success'))
@@ -180,7 +180,7 @@ async function rejectReturn(id: number) {
   } catch { /* ignore */ }
 }
 
-async function confirmReceipt(id: number) {
+async function confirmReceipt(id: string) {
   try {
     await service.put(`/seller/returns/${id}/receive`)
     message.success(t('common.success'))
@@ -188,7 +188,7 @@ async function confirmReceipt(id: number) {
   } catch { /* ignore */ }
 }
 
-async function inspectPass(id: number) {
+async function inspectPass(id: string) {
   try {
     await service.put(`/seller/returns/${id}/inspect`, { status: 5 })
     message.success(t('common.success'))
@@ -196,7 +196,7 @@ async function inspectPass(id: number) {
   } catch { /* ignore */ }
 }
 
-function openDisputeModal(id: number) {
+function openDisputeModal(id: string) {
   disputeReturnId.value = id
   disputeComment.value = ''
   disputeModalOpen.value = true

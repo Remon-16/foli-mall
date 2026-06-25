@@ -55,9 +55,9 @@ const loading = ref(false)
 const messages = ref<MessageVO[]>([])
 const inputMessage = ref('')
 const messagesContainer = ref<HTMLElement | null>(null)
-const currentUserId = ref<number>(authStore.userInfo?.id ?? 0)
+const currentUserId = ref<string>(authStore.userInfo?.id ?? '')
 const otherUserName = ref('')
-const receiverId = ref<number>(0)
+const receiverId = ref<string>('')
 
 async function fetchMessages() {
   const conversationId = route.params.conversationId as string

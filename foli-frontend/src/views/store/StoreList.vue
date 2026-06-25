@@ -64,7 +64,7 @@ async function fetchStores() {
   }
 }
 
-function goToStore(id: number) {
+function goToStore(id: string) {
   router.push(`/stores/${id}`)
 }
 

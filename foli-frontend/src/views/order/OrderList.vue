@@ -74,7 +74,7 @@ function handlePageChange(page: number) {
   fetchOrders()
 }
 
-function goToDetail(id: number) {
+function goToDetail(id: string) {
   router.push(`/orders/${id}`)
 }
 

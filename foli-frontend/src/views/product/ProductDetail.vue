@@ -14,7 +14,7 @@ const loading = ref(false)
 const quantity = ref(1)
 const addingToCart = ref(false)
 
-const productId = Number(route.params.id)
+const productId = route.params.id as string
 
 onMounted(() => {
   fetchProduct()
