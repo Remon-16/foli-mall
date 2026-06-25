@@ -166,7 +166,7 @@ function handleTableChange(pag: { current: number; pageSize: number }) {
 
 async function approveReturn(id: string) {
   try {
-    await service.put(`/seller/returns/${id}/review`, { status: 1 })
+    await service.put(`/seller/returns/${id}/approve`, {})
     message.success(t('common.success'))
     fetchReturns()
   } catch { /* ignore */ }
@@ -174,7 +174,7 @@ async function approveReturn(id: string) {
 
 async function rejectReturn(id: string) {
   try {
-    await service.put(`/seller/returns/${id}/review`, { status: 2 })
+    await service.put(`/seller/returns/${id}/reject`, {})
     message.success(t('common.success'))
     fetchReturns()
   } catch { /* ignore */ }
@@ -182,7 +182,7 @@ async function rejectReturn(id: string) {
 
 async function confirmReceipt(id: string) {
   try {
-    await service.put(`/seller/returns/${id}/receive`)
+    await service.put(`/seller/returns/${id}/confirm-receipt`)
     message.success(t('common.success'))
     fetchReturns()
   } catch { /* ignore */ }
@@ -190,7 +190,7 @@ async function confirmReceipt(id: string) {
 
 async function inspectPass(id: string) {
   try {
-    await service.put(`/seller/returns/${id}/inspect`, { status: 5 })
+    await service.put(`/seller/returns/${id}/inspect-pass`)
     message.success(t('common.success'))
     fetchReturns()
   } catch { /* ignore */ }

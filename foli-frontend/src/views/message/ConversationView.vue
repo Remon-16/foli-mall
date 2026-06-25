@@ -85,6 +85,9 @@ async function fetchMessages() {
         otherUserName.value = lastMsg.senderName
       }
     }
+
+    // 标记会话全部已读
+    service.put(`/messages/conversation/${conversationId}/read-all`).catch(() => {})
   } catch {
     // ignore
   } finally {
