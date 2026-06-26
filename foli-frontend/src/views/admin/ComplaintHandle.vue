@@ -29,6 +29,11 @@
         <template v-if="column.key === 'type'">
           {{ complaintTypeText(record.type) }}
         </template>
+        <template v-if="column.key === 'target'">
+          <span v-if="record.storeName">{{ record.storeName }}</span>
+          <span v-else-if="record.reportedUserName">{{ record.reportedUserName }}</span>
+          <span v-else>-</span>
+        </template>
         <template v-if="column.key === 'status'">
           <a-tag :color="complaintStatusColor(record.status)">
             {{ complaintStatusText(record.status) }}
@@ -53,7 +58,8 @@
       <a-descriptions bordered :column="1" v-if="currentComplaint">
         <a-descriptions-item :label="t('complaint.complaintTitle')">{{ currentComplaint.title }}</a-descriptions-item>
         <a-descriptions-item :label="t('complaint.complaintType')">{{ complaintTypeText(currentComplaint.type) }}</a-descriptions-item>
-        <a-descriptions-item :label="t('complaint.targetStore')">{{ currentComplaint.storeName }}</a-descriptions-item>
+        <a-descriptions-item v-if="currentComplaint.storeName" :label="t('complaint.targetStore')">{{ currentComplaint.storeName }}</a-descriptions-item>
+        <a-descriptions-item v-if="currentComplaint.reportedUserName" :label="t('complaint.targetUser')">{{ currentComplaint.reportedUserName }}</a-descriptions-item>
         <a-descriptions-item :label="t('complaint.complaintContent')">{{ currentComplaint.content }}</a-descriptions-item>
         <a-descriptions-item :label="t('return.evidenceImages')">{{ currentComplaint.evidenceImages || '-' }}</a-descriptions-item>
         <a-descriptions-item :label="t('return.status')">
@@ -106,7 +112,7 @@ const statusFilter = ref<number | null>(null)
 const columns = [
   { title: t('complaint.complaintTitle'), key: 'title', dataIndex: 'title' },
   { title: t('complaint.complaintType'), key: 'type', dataIndex: 'type' },
-  { title: t('complaint.targetStore'), key: 'storeName', dataIndex: 'storeName' },
+  { title: t('complaint.targetStore'), key: 'target' },
   { title: t('return.status'), key: 'status' },
   { title: t('time'), key: 'createTime', dataIndex: 'createTime' },
   { title: t('common.actions'), key: 'actions' },

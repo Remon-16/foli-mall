@@ -34,9 +34,32 @@
           >
             {{ t('return.shipBack') }}
           </a-button>
+          <a-button
+            v-if="record.status === 2"
+            type="primary"
+            size="small"
+            danger
+            @click="openDisputeModal(record.id)"
+          >
+            {{ t('return.dispute') }}
+          </a-button>
         </template>
       </template>
     </a-table>
+
+    <!-- Dispute Modal -->
+    <a-modal
+      v-model:open="disputeModalOpen"
+      :title="t('return.dispute')"
+      @ok="handleDispute"
+      :confirm-loading="disputeSubmitting"
+    >
+      <a-form layout="vertical">
+        <a-form-item :label="t('return.returnReason')" required>
+          <a-textarea v-model:value="disputeReason" :rows="4" :placeholder="t('return.returnReason')" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
 
     <!-- Apply Return Modal -->
     <a-modal
@@ -109,6 +132,11 @@ columns.forEach((col) => {
 const applyModalOpen = ref(false)
 const submitting = ref(false)
 const completedOrders = ref<OrderVO[]>([])
+
+const disputeModalOpen = ref(false)
+const disputeSubmitting = ref(false)
+const disputeReturnId = ref<string>('')
+const disputeReason = ref('')
 const applyForm = reactive({
   orderId: null as number | null,
   returnReason: '',
@@ -205,6 +233,30 @@ async function handleApply() {
     fetchReturns()
   } finally {
     submitting.value = false
+  }
+}
+
+function openDisputeModal(id: string) {
+  disputeReturnId.value = id
+  disputeReason.value = ''
+  disputeModalOpen.value = true
+}
+
+async function handleDispute() {
+  if (!disputeReason.value.trim()) {
+    message.warning(t('return.returnReason'))
+    return
+  }
+  disputeSubmitting.value = true
+  try {
+    await service.put(`/returns/${disputeReturnId.value}/dispute`, {
+      reason: disputeReason.value,
+    })
+    message.success(t('common.success'))
+    disputeModalOpen.value = false
+    fetchReturns()
+  } finally {
+    disputeSubmitting.value = false
   }
 }
 

@@ -108,4 +108,13 @@ public interface FmReturnRefundService {
      * @param result   处理结果 handle result
      */
     void handleDispute(Long returnId, String result);
+
+    /**
+     * 买家争议申诉（卖家驳回后）Buyer disputes rejected return
+     *
+     * @param returnId 退货ID return ID
+     * @param userId   买家用户ID buyer user ID
+     * @param reason   争议原因 dispute reason
+     */
+    void buyerDispute(Long returnId, Long userId, String reason);
 }

@@ -12,6 +12,7 @@
 | 1.0.0 | 2026-06-24 | Initial version | Dev Team |
 | 2.0.0 | 2026-06-24 | Enterprise format restructure | Dev Team |
 | 2.1.0 | 2026-06-26 | Added seller complaint against buyer | Dev Team |
+| 2.2.0 | 2026-06-26 | Added buyer dispute appeal (after seller rejection) | Dev Team |
 
 ---
 
@@ -24,7 +25,7 @@
 | Refund-only | returnType=0; seller approves → direct refund, no return shipment needed |
 | Return & refund | returnType=1; buyer ships back → seller inspects → refund |
 | Return number | Format: RT + yyyyMMdd + 6 random digits, globally unique |
-| Dispute | Seller disputes the returned goods during inspection; auto-creates a complaint |
+| Dispute | Seller disputes returned goods during inspection, or buyer disputes seller's rejection; auto-creates a complaint |
 | Arbitration | Admin rules on a disputed return; current implementation always refunds |
 
 ### 2.2 Permissions
@@ -36,13 +37,14 @@
 | Ship back | Yes (own returns) | — | — |
 | Review returns | — | Yes (own store) | — |
 | Confirm receipt/inspect | — | Yes (own store) | — |
-| File dispute | — | Yes (own store) | — |
+| File dispute (inspect) | — | Yes (own store) | — |
+| File dispute appeal | Yes (own rejected returns) | — | — |
 | File complaint against buyer | — | Yes | — |
 | Arbitrate dispute | — | — | Yes |
 
 ### 2.3 Scope
 
-**In scope**: Return application; seller review; buyer ship-back; inspection & refund; dispute mechanism; admin arbitration; auto-complaint on dispute; seller complaint against buyer (entry in return flow).
+**In scope**: Return application; seller review; buyer ship-back; inspection & refund; dispute mechanism (seller inspection dispute + buyer rejection appeal); admin arbitration; auto-complaint on dispute; seller complaint against buyer (entry in return flow).
 
 **Out of scope**: INSPECTING(5) intermediate state (defined but unused); partial refunds (always full order amount); non-dispute inspection failure path; stock restoration on refund.
 
@@ -61,7 +63,7 @@
   │  Pending Review   │
   └──┬───────┬───────┘
      │       │
-     │       └── REJECTED(2)
+     │       └── REJECTED(2) → buyerDispute → DISPUTED(7) → handleDispute → REFUNDED(6)
      │
   APPROVED(1)
      │
@@ -107,6 +109,7 @@
 | Approve (refund-only) | Seller | PENDING_REVIEW | REFUNDED(6) | Refund to buyer |
 | Approve (return&refund) | Seller | PENDING_REVIEW | APPROVED(1) | — |
 | Reject | Seller | PENDING_REVIEW | REJECTED(2) | No refund |
+| Buyer dispute appeal | Buyer | REJECTED(2) | DISPUTED(7) | Auto-create complaint |
 | Ship back | Buyer | APPROVED(1) | BUYER_SHIPPING(3) | Record shipBackTime |
 | Confirm receipt | Seller | BUYER_SHIPPING(3) | SELLER_RECEIVED(4) | — |
 | Inspect pass | Seller | SELLER_RECEIVED(4) | REFUNDED(6) | Refund + record inspectTime |
@@ -117,7 +120,11 @@
 
 ### 4.3 Dispute → Complaint Linkage
 
-When seller disputes: return→DISPUTED(7) + auto-create Complaint(type=return_dispute, status=PENDING, linked via returnId). Admin handles complaint and arbitrates return.
+**Seller inspection dispute**: Seller disputes after failed inspection → status DISPUTED(7) + auto-create complaint.
+
+**Buyer rejection appeal**: After seller rejects (REJECTED), buyer can file a dispute appeal → status DISPUTED(7) + auto-create complaint.
+
+When dispute is filed: return→DISPUTED(7) + auto-create Complaint(type=return_dispute, status=PENDING, linked via returnId). Admin handles complaint and arbitrates return.
 
 **Known limitation**: Complaint not auto-updated after arbitration; admin cannot deny refund.
 

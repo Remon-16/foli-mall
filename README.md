@@ -188,6 +188,35 @@ H2 控制台：<http://localhost:8080/h2-console>（JDBC URL: `jdbc:h2:mem:foli_
 - `docs/zh-CN/` — 中文文档
 - `docs/en-US/` — 英文文档
 
+## 已知问题
+
+### 开店后需审核通过才能访问卖家中心
+
+普通用户（BUYER）申请开店后，角色会在数据库中升级为 SELLER，但 JWT token 中保存的角色信息不会同步更新。因此在管理员审核通过店铺之前，访问卖家中心（店铺管理、商品管理等）会返回 403。
+
+**测试时的解决方法**：申请开店后，退出登录并重新登录，使角色变更生效。
+
+### 退货流程中"投诉用户"按钮的出现时机
+
+卖家在退货管理页面（/seller/returns）处理退货时，"投诉用户"按钮仅在退货状态为 **3（买家已发货）、4（卖家已收货）、7（已争议）** 时可见。退货状态流转路径：
+
+```
+买家申请退货 → status=0（待审核）
+  ├─ 卖家同意退货（returnType=1 退货退款） → status=1（已通过）
+  │   → 买家发货 → status=3（买家已发货）        ← 投诉用户按钮出现
+  │     → 卖家确认收货 → status=4（卖家已收货）   ← 投诉用户按钮出现
+  │       ├─ 卖家验货通过 → status=6（已退款）
+  │       └─ 卖家验货不通过/发起争议 → status=7（已争议） ← 投诉用户按钮出现
+  │           → 管理员仲裁 → status=6（已退款）
+  └─ 卖家驳回 → status=2（已驳回）
+      → 买家争议申诉 → status=7（已争议）
+          → 管理员仲裁 → status=6（已退款）
+```
+
+- status=5（INSPECTING）已定义但当前未使用
+- returnType=0（仅退款）时，卖家同意后直接到 status=6，不经过 status 3/4
+- 卖家驳回后，买家可在退货列表发起争议申诉，由管理员仲裁
+
 ## 测试
 
 项目包含完整的单元测试和集成测试，覆盖所有 Service 层（11 个实现类）和关键 Controller 层。
@@ -214,7 +243,7 @@ cd foli-backend
 | 层级 | 测试类 | 测试方法数 |
 | ---- | ------ | ----------- |
 | Service | FmOrderServiceImplTest | 37 |
-| Service | FmReturnRefundServiceImplTest | 25 |
+| Service | FmReturnRefundServiceImplTest | 29 |
 | Service | FmStoreServiceImplTest | 16 |
 | Service | FmProductServiceImplTest | 14 |
 | Service | FmCartItemServiceImplTest | 13 |

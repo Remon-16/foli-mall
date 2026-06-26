@@ -364,6 +364,67 @@ class FmReturnRefundServiceImplTest {
         }
     }
 
+    // ==================== buyerDispute ====================
+
+    @Nested
+    @DisplayName("buyerDispute — 买家争议申诉")
+    class BuyerDisputeTests {
+
+        @Test
+        @DisplayName("should_dispute_and_create_complaint_when_return_is_rejected")
+        void shouldDisputeAndCreateComplaint_whenReturnIsRejected() {
+            FmReturnRefund rr = TestDataFactory.createReturnRefund(1L, orderId, buyerId, storeId,
+                    ReturnRefundStatusEnum.REJECTED.getCode(), 1, refundAmount);
+
+            when(returnRefundMapper.selectById(1L)).thenReturn(rr);
+            when(returnRefundMapper.updateById(any(FmReturnRefund.class))).thenReturn(1);
+            when(complaintMapper.insert(any(FmComplaint.class))).thenReturn(1);
+
+            returnService.buyerDispute(1L, buyerId, "Seller rejected unfairly");
+
+            assertThat(rr.getStatus()).isEqualTo(ReturnRefundStatusEnum.DISPUTED.getCode());
+            assertThat(rr.getDisputeTime()).isNotNull();
+            assertThat(rr.getSellerComment()).isEqualTo("Seller rejected unfairly");
+            verify(complaintMapper).insert(any(FmComplaint.class));
+        }
+
+        @Test
+        @DisplayName("should_throw_return_not_found_when_return_does_not_exist")
+        void shouldThrowReturnNotFound_whenReturnDoesNotExist() {
+            when(returnRefundMapper.selectById(999L)).thenReturn(null);
+
+            assertThatThrownBy(() -> returnService.buyerDispute(999L, buyerId, "reason"))
+                    .isInstanceOf(BusinessException.class)
+                    .extracting("code")
+                    .isEqualTo(BizCodeEnum.RETURN_NOT_FOUND.getCode());
+        }
+
+        @Test
+        @DisplayName("should_throw_forbidden_when_disputing_others_return")
+        void shouldThrowForbidden_whenDisputingOthersReturn() {
+            FmReturnRefund rr = TestDataFactory.createReturnRefund(1L, orderId, 999L, storeId,
+                    ReturnRefundStatusEnum.REJECTED.getCode(), 1, refundAmount);
+            when(returnRefundMapper.selectById(1L)).thenReturn(rr);
+
+            assertThatThrownBy(() -> returnService.buyerDispute(1L, buyerId, "reason"))
+                    .isInstanceOf(BusinessException.class)
+                    .extracting("code")
+                    .isEqualTo(BizCodeEnum.FORBIDDEN.getCode());
+        }
+
+        @Test
+        @DisplayName("should_throw_wrong_return_status_when_return_is_not_rejected")
+        void shouldThrowWrongReturnStatus_whenReturnIsNotRejected() {
+            FmReturnRefund rr = TestDataFactory.createPendingReturn(1L, orderId, buyerId, storeId, 0, refundAmount);
+            when(returnRefundMapper.selectById(1L)).thenReturn(rr);
+
+            assertThatThrownBy(() -> returnService.buyerDispute(1L, buyerId, "reason"))
+                    .isInstanceOf(BusinessException.class)
+                    .extracting("code")
+                    .isEqualTo(BizCodeEnum.WRONG_RETURN_STATUS.getCode());
+        }
+    }
+
     // ==================== handleDispute ====================
 
     @Nested

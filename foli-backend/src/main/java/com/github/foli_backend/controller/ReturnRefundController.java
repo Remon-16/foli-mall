@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 /**
  * 退货退款控制器 / Return/refund controller
  */
@@ -69,6 +71,18 @@ public class ReturnRefundController {
     public Result<Void> shipBack(@PathVariable Long id) {
         Long userId = UserContext.getUserId();
         returnRefundService.shipBack(id, userId);
+        return Result.success();
+    }
+
+    /**
+     * 买家争议申诉（卖家驳回后）Buyer disputes rejected return
+     */
+    @PutMapping("/{id}/dispute")
+    @Operation(summary = "买家争议申诉 Buyer disputes rejected return")
+    public Result<Void> dispute(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        Long userId = UserContext.getUserId();
+        String reason = body.getOrDefault("reason", "");
+        returnRefundService.buyerDispute(id, userId, reason);
         return Result.success();
     }
 }

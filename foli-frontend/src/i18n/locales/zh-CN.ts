@@ -158,6 +158,7 @@ export default {
     statusRefunded: '已退款',
     statusDisputed: '争议中',
     shipBack: '寄回商品',
+    dispute: '争议申诉',
     sellerComment: '卖家意见',
     evidenceImages: '证据图片',
     adminResult: '管理员仲裁结果',

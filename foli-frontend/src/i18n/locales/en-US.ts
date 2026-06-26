@@ -158,6 +158,7 @@ export default {
     statusRefunded: 'Refunded',
     statusDisputed: 'Disputed',
     shipBack: 'Ship Back',
+    dispute: 'Dispute',
     sellerComment: 'Seller Comment',
     evidenceImages: 'Evidence Images',
     adminResult: 'Admin Arbitration Result',

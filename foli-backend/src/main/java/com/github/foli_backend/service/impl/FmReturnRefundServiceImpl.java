@@ -247,6 +247,37 @@ public class FmReturnRefundServiceImpl implements FmReturnRefundService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void buyerDispute(Long returnId, Long userId, String reason) {
+        FmReturnRefund returnRefund = returnRefundMapper.selectById(returnId);
+        if (returnRefund == null) {
+            BizCodeEnum.RETURN_NOT_FOUND.throwEx();
+        }
+        if (!returnRefund.getUserId().equals(userId)) {
+            BizCodeEnum.FORBIDDEN.throwEx();
+        }
+        if (returnRefund.getStatus() != ReturnRefundStatusEnum.REJECTED.getCode()) {
+            BizCodeEnum.WRONG_RETURN_STATUS.throwEx();
+        }
+
+        returnRefund.setStatus(ReturnRefundStatusEnum.DISPUTED.getCode());
+        returnRefund.setDisputeTime(LocalDateTime.now());
+        returnRefund.setSellerComment(reason);
+        returnRefundMapper.updateById(returnRefund);
+
+        FmComplaint complaint = new FmComplaint();
+        complaint.setUserId(userId);
+        complaint.setReportedUserId(null);
+        complaint.setStoreId(returnRefund.getStoreId());
+        complaint.setReturnId(returnRefund.getId());
+        complaint.setType("return_dispute");
+        complaint.setTitle("退货争议申诉 Return Dispute Appeal");
+        complaint.setContent(reason);
+        complaint.setStatus(ComplaintStatusEnum.PENDING.getCode());
+        complaintMapper.insert(complaint);
+    }
+
+    @Override
     public PageResult<ReturnRefundVO> listAllReturns(int page, int pageSize, Integer status) {
         LambdaQueryWrapper<FmReturnRefund> wrapper = new LambdaQueryWrapper<FmReturnRefund>()
                 .orderByDesc(FmReturnRefund::getCreateTime);
