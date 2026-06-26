@@ -24,6 +24,7 @@ function goReturns() { router.push('/returns') }
 function goMessages() { router.push('/messages') }
 function goComplaints() { router.push('/complaints') }
 function goSeller() { router.push('/seller') }
+function goBecomeSeller() { router.push('/become-seller') }
 function goAdmin() { router.push('/admin') }
 function logout() { authStore.logout(); router.push('/') }
 </script>
@@ -46,6 +47,7 @@ function logout() { authStore.logout(); router.push('/') }
           <a-button type="link" @click="goComplaints">{{ t('nav.complaints') }}</a-button>
           <a-button type="link" @click="goAccount">{{ t('nav.account') }}</a-button>
           <a-button v-if="authStore.isSeller" type="link" @click="goSeller">{{ t('nav.sellerCenter') }}</a-button>
+          <a-button v-else-if="authStore.isLoggedIn" type="link" @click="goBecomeSeller">{{ t('nav.becomeSeller') }}</a-button>
           <a-button v-if="authStore.isAdmin" type="link" @click="goAdmin">{{ t('nav.adminPanel') }}</a-button>
           <a-dropdown>
             <a-button type="link">{{ authStore.userInfo?.nickname || 'User' }}</a-button>

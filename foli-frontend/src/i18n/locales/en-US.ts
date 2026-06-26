@@ -35,6 +35,7 @@ export default {
     sellerCenter: 'Seller Center',
     adminPanel: 'Admin Panel',
     returns: 'Returns & Refunds',
+    becomeSeller: 'Become a Seller',
   },
   auth: {
     loginTitle: 'User Login',
@@ -126,6 +127,7 @@ export default {
     ownerNickname: 'Owner',
     myStore: 'My Store',
     editStore: 'Edit Store Info',
+    applyInfo: 'After applying, you will become a seller and can manage your store in the Seller Center. Your store needs admin approval before listing products.',
   },
   account: {
     balance: 'Account Balance',
@@ -193,6 +195,7 @@ export default {
     typeFraud: 'Fraudulent Activity',
     typeReturnDispute: 'Return Dispute',
     typeOther: 'Other',
+    targetUser: 'Reported User',
   },
   admin: {
     storeReview: 'Store Review',
@@ -231,6 +234,7 @@ export default {
     confirmReceipt: 'Confirm Receipt',
     inspectPass: 'Inspection Passed',
     dispute: 'Initiate Dispute',
+    reportBuyer: 'Report Buyer',
   },
   productStatus: {
     draft: 'Draft',

@@ -42,9 +42,13 @@ public class FmComplaintServiceImpl implements FmComplaintService {
 
     @Override
     public ComplaintVO createComplaint(Long userId, ComplaintCreateRequest req) {
+        if (req.getStoreId() == null && req.getReportedUserId() == null) {
+            BizCodeEnum.BAD_REQUEST.throwEx("storeId or reportedUserId is required");
+        }
         FmComplaint complaint = new FmComplaint();
         complaint.setUserId(userId);
         complaint.setStoreId(req.getStoreId());
+        complaint.setReportedUserId(req.getReportedUserId());
         complaint.setOrderId(req.getOrderId());
         complaint.setProductId(req.getProductId());
         complaint.setReturnId(req.getReturnId());
@@ -133,9 +137,18 @@ public class FmComplaintServiceImpl implements FmComplaintService {
             vo.setUserName(user.getNickname());
         }
 
-        FmStore store = storeMapper.selectById(c.getStoreId());
-        if (store != null) {
-            vo.setStoreName(store.getStoreName());
+        if (c.getStoreId() != null) {
+            FmStore store = storeMapper.selectById(c.getStoreId());
+            if (store != null) {
+                vo.setStoreName(store.getStoreName());
+            }
+        }
+
+        if (c.getReportedUserId() != null) {
+            FmUser reportedUser = userMapper.selectById(c.getReportedUserId());
+            if (reportedUser != null) {
+                vo.setReportedUserName(reportedUser.getNickname());
+            }
         }
 
         return vo;

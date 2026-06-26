@@ -11,6 +11,7 @@
 |---------|------|---------|--------|
 | 1.0.0 | 2026-06-24 | Initial version | Dev Team |
 | 2.0.0 | 2026-06-24 | Enterprise format restructure | Dev Team |
+| 2.1.0 | 2026-06-26 | Added seller complaint against buyer | Dev Team |
 
 ---
 
@@ -36,11 +37,12 @@
 | Review returns | — | Yes (own store) | — |
 | Confirm receipt/inspect | — | Yes (own store) | — |
 | File dispute | — | Yes (own store) | — |
+| File complaint against buyer | — | Yes | — |
 | Arbitrate dispute | — | — | Yes |
 
 ### 2.3 Scope
 
-**In scope**: Return application; seller review; buyer ship-back; inspection & refund; dispute mechanism; admin arbitration; auto-complaint on dispute.
+**In scope**: Return application; seller review; buyer ship-back; inspection & refund; dispute mechanism; admin arbitration; auto-complaint on dispute; seller complaint against buyer (entry in return flow).
 
 **Out of scope**: INSPECTING(5) intermediate state (defined but unused); partial refunds (always full order amount); non-dispute inspection failure path; stock restoration on refund.
 

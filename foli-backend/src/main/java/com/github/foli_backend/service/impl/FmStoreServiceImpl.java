@@ -49,7 +49,11 @@ public class FmStoreServiceImpl implements FmStoreService {
         if (user == null) {
             BizCodeEnum.USER_NOT_FOUND.throwEx();
         }
-        if (user.getRole() != RoleConstants.SELLER) {
+        if (user.getRole() == RoleConstants.BUYER) {
+            user.setRole(RoleConstants.SELLER);
+            userMapper.updateById(user);
+            log.info("User role upgraded to SELLER: userId={}", userId);
+        } else if (user.getRole() != RoleConstants.SELLER) {
             BizCodeEnum.NOT_SELLER_ROLE.throwEx();
         }
 

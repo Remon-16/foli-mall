@@ -84,10 +84,30 @@ class FmStoreServiceImplTest {
         }
 
         @Test
-        @DisplayName("should_throw_not_seller_role_when_user_is_buyer")
-        void shouldThrowNotSellerRole_whenUserIsBuyer() {
+        @DisplayName("should_auto_upgrade_buyer_to_seller_and_create_store")
+        void shouldAutoUpgradeBuyerToSellerAndCreateStore() {
             FmUser buyer = TestDataFactory.createBuyer(userId, "buyer1");
             when(userMapper.selectById(userId)).thenReturn(buyer);
+            when(userMapper.updateById(any(FmUser.class))).thenReturn(1);
+            when(storeMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
+            when(storeMapper.insert(any(FmStore.class))).thenReturn(1);
+
+            StoreApplyRequest req = new StoreApplyRequest();
+            req.setStoreName("My First Store");
+
+            FmStore result = storeService.applyStore(userId, req);
+
+            assertThat(buyer.getRole()).isEqualTo(RoleConstants.SELLER);
+            verify(userMapper).updateById(buyer);
+            assertThat(result.getStoreName()).isEqualTo("My First Store");
+            assertThat(result.getStatus()).isEqualTo(StoreStatusEnum.PENDING.getCode());
+        }
+
+        @Test
+        @DisplayName("should_throw_not_seller_role_when_user_is_admin")
+        void shouldThrowNotSellerRole_whenUserIsAdmin() {
+            FmUser admin = TestDataFactory.createUser(userId, "admin", RoleConstants.ADMIN, 1);
+            when(userMapper.selectById(userId)).thenReturn(admin);
 
             StoreApplyRequest req = new StoreApplyRequest();
 

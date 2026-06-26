@@ -175,8 +175,10 @@ export interface ComplaintVO {
   userName: string
   orderId: string | null
   productId: string | null
-  storeId: string
+  storeId: string | null
   storeName: string
+  reportedUserId: string | null
+  reportedUserName: string | null
   returnId: string | null
   type: string
   title: string

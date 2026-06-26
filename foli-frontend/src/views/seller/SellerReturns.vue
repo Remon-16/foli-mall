@@ -69,6 +69,15 @@
               {{ t('seller.dispute') }}
             </a-button>
           </template>
+          <!-- Report Buyer button (visible after initial review) -->
+          <a-button
+            v-if="[3, 4, 5, 7].includes(record.status)"
+            size="small"
+            style="margin-left: 8px"
+            @click="openComplaintModal(record)"
+          >
+            {{ t('seller.reportBuyer') }}
+          </a-button>
         </template>
       </template>
     </a-table>
@@ -83,6 +92,35 @@
       <a-form layout="vertical">
         <a-form-item :label="t('return.sellerComment')" required>
           <a-textarea v-model:value="disputeComment" :rows="4" :placeholder="t('return.sellerComment')" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <!-- Report Buyer Modal -->
+    <a-modal
+      v-model:open="complaintModalOpen"
+      :title="t('seller.reportBuyer')"
+      @ok="handleComplaint"
+      :confirm-loading="complaintSubmitting"
+    >
+      <a-form layout="vertical">
+        <a-form-item :label="t('complaint.complaintType')" required>
+          <a-select v-model:value="complaintForm.type" :placeholder="t('complaint.complaintType')">
+            <a-select-option value="product_quality">{{ t('complaint.typeProductQuality') }}</a-select-option>
+            <a-select-option value="service">{{ t('complaint.typeService') }}</a-select-option>
+            <a-select-option value="fraud">{{ t('complaint.typeFraud') }}</a-select-option>
+            <a-select-option value="return_dispute">{{ t('complaint.typeReturnDispute') }}</a-select-option>
+            <a-select-option value="other">{{ t('complaint.typeOther') }}</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item :label="t('complaint.complaintTitle')" required>
+          <a-input v-model:value="complaintForm.title" :placeholder="t('complaint.complaintTitle')" />
+        </a-form-item>
+        <a-form-item :label="t('complaint.complaintContent')" required>
+          <a-textarea v-model:value="complaintForm.content" :rows="4" :placeholder="t('complaint.complaintContent')" />
+        </a-form-item>
+        <a-form-item :label="t('return.evidenceImages')">
+          <a-input v-model:value="complaintForm.evidenceImages" :placeholder="t('return.evidenceImages')" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -118,6 +156,16 @@ const disputeModalOpen = ref(false)
 const submitting = ref(false)
 const disputeReturnId = ref<number | null>(null)
 const disputeComment = ref('')
+
+const complaintModalOpen = ref(false)
+const complaintSubmitting = ref(false)
+const complaintTargetId = ref<string>('')
+const complaintForm = reactive({
+  type: 'return_dispute',
+  title: '',
+  content: '',
+  evidenceImages: '',
+})
 
 function returnStatusText(status: number): string {
   const map: Record<number, string> = {
@@ -217,6 +265,43 @@ async function handleDispute() {
     fetchReturns()
   } finally {
     submitting.value = false
+  }
+}
+
+function openComplaintModal(record: ReturnRefundVO) {
+  complaintTargetId.value = record.id
+  complaintForm.type = 'return_dispute'
+  complaintForm.title = ''
+  complaintForm.content = ''
+  complaintForm.evidenceImages = ''
+  complaintModalOpen.value = true
+}
+
+async function handleComplaint() {
+  if (!complaintForm.title.trim()) {
+    message.warning(t('complaint.complaintTitle'))
+    return
+  }
+  if (!complaintForm.content.trim()) {
+    message.warning(t('complaint.complaintContent'))
+    return
+  }
+  complaintSubmitting.value = true
+  try {
+    const target = records.value.find(r => r.id === complaintTargetId.value)
+    await service.post('/complaints', {
+      reportedUserId: target?.userId ? Number(target.userId) : undefined,
+      orderId: target?.orderId ? Number(target.orderId) : undefined,
+      returnId: complaintTargetId.value ? Number(complaintTargetId.value) : undefined,
+      type: complaintForm.type,
+      title: complaintForm.title,
+      content: complaintForm.content,
+      evidenceImages: complaintForm.evidenceImages,
+    })
+    message.success(t('common.success'))
+    complaintModalOpen.value = false
+  } finally {
+    complaintSubmitting.value = false
   }
 }
 

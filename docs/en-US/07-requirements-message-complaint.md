@@ -11,6 +11,7 @@
 |---------|------|---------|--------|
 | 1.0.0 | 2026-06-24 | Initial version | Dev Team |
 | 2.0.0 | 2026-06-24 | Enterprise format restructure | Dev Team |
+| 2.1.0 | 2026-06-26 | Seller can file complaints against users; storeId optional; added reportedUserId | Dev Team |
 
 ---
 
@@ -32,13 +33,13 @@
 | Send messages | Yes | Yes | — |
 | View own conversations | Yes | Yes | — |
 | Mark as read | Yes (own) | Yes (own) | — |
-| File complaint | Yes | — | — |
-| View own complaints | Yes | — | — |
+| File complaint | Yes | Yes (against user) | — |
+| View own complaints | Yes | Yes | — |
 | View/handle all complaints | — | — | Yes |
 
 ### 2.3 Scope
 
-**In scope**: 1-on-1 buyer-seller messaging; conversation grouping with unread counts; complaint creation & handling; auto-complaint on return dispute.
+**In scope**: 1-on-1 buyer-seller messaging; conversation grouping with unread counts; complaint creation & handling (buyer against store, seller against user); auto-complaint on return dispute.
 
 **Out of scope**: Group chat; push notifications/read receipts; IN_PROGRESS(1) complaint status (PENDING can directly become RESOLVED/REJECTED).
 
@@ -114,7 +115,7 @@ Seller disputes return → return status → DISPUTED(7)
 
 **Precondition**: Logged in.
 
-**Rules**: Optionally links to order/product/store/return. Types include product_quality/service/delivery/fraud/return_dispute/other. Title and content required. Initial status PENDING(0).
+**Rules**: Optionally links to order/product/store/return. storeId is optional; reportedUserId can be set for seller→buyer complaints. At least one of storeId or reportedUserId is required. Types include product_quality/service/delivery/fraud/return_dispute/other. Title and content required. Initial status PENDING(0).
 
 ### 4.5 Handle Complaint
 

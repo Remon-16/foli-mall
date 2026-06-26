@@ -17,6 +17,11 @@
         <template v-if="column.key === 'type'">
           {{ complaintTypeText(record.type) }}
         </template>
+        <template v-if="column.key === 'target'">
+          <span v-if="record.storeName">{{ record.storeName }}</span>
+          <span v-else-if="record.reportedUserName">{{ record.reportedUserName }}</span>
+          <span v-else>-</span>
+        </template>
         <template v-if="column.key === 'status'">
           <a-tag :color="complaintStatusColor(record.status)">
             {{ complaintStatusText(record.status) }}
@@ -99,7 +104,7 @@ const pagination = reactive({ page: 1, pageSize: 10 })
 const columns = [
   { title: t('complaint.complaintTitle'), key: 'title', dataIndex: 'title' },
   { title: t('complaint.complaintType'), key: 'type', dataIndex: 'type' },
-  { title: t('complaint.targetStore'), key: 'storeName', dataIndex: 'storeName' },
+  { title: t('complaint.targetStore'), key: 'target' },
   { title: t('return.status'), key: 'status' },
   { title: t('time'), key: 'createTime', dataIndex: 'createTime' },
   { title: t('common.actions'), key: 'actions' },

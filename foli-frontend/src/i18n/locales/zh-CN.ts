@@ -35,6 +35,7 @@ export default {
     sellerCenter: '卖家中心',
     adminPanel: '管理后台',
     returns: '退货退款',
+    becomeSeller: '申请开店',
   },
   auth: {
     loginTitle: '用户登录',
@@ -126,6 +127,7 @@ export default {
     ownerNickname: '店主',
     myStore: '我的店铺',
     editStore: '编辑店铺信息',
+    applyInfo: '申请开店后，您将成为卖家，并可以在卖家中心管理您的店铺。店铺需要管理员审核通过后才能上架商品。',
   },
   account: {
     balance: '账户余额',
@@ -193,6 +195,7 @@ export default {
     typeFraud: '欺诈行为',
     typeReturnDispute: '退货争议',
     typeOther: '其他',
+    targetUser: '被投诉用户',
   },
   admin: {
     storeReview: '店铺审核',
@@ -231,6 +234,7 @@ export default {
     confirmReceipt: '确认收货',
     inspectPass: '验货通过',
     dispute: '发起争议',
+    reportBuyer: '投诉用户',
   },
   productStatus: {
     draft: '草稿',

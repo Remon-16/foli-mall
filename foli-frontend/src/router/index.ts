@@ -40,6 +40,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'messages/new', name: 'NewConversation', component: () => import('@/views/message/ConversationView.vue'), meta: { title: '新建会话 New Chat' } },
       { path: 'messages/:conversationId', name: 'Conversation', component: () => import('@/views/message/ConversationView.vue'), meta: { title: '会话 Chat' } },
       { path: 'complaints', name: 'ComplaintList', component: () => import('@/views/complaint/ComplaintList.vue'), meta: { title: '投诉 Complaints' } },
+      { path: 'become-seller', name: 'BecomeSeller', component: () => import('@/views/store/BecomeSeller.vue'), meta: { title: '申请开店 Become Seller' } },
     ],
   },
   {

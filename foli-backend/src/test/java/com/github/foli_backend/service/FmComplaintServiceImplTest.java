@@ -69,6 +69,43 @@ class FmComplaintServiceImplTest {
             assertThat(result.getStatus()).isEqualTo(ComplaintStatusEnum.PENDING.getCode());
             assertThat(result.getUserName()).isEqualTo("buyer_nick");
         }
+
+        @Test
+        @DisplayName("should_create_complaint_with_reported_user_id_when_seller_complains_about_buyer")
+        void shouldCreateComplaintWithReportedUserId_whenSellerComplainsAboutBuyer() {
+            when(complaintMapper.insert(any(FmComplaint.class))).thenReturn(1);
+            FmUser complainant = TestDataFactory.createSeller(userId, "seller1");
+            when(userMapper.selectById(userId)).thenReturn(complainant);
+
+            Long reportedUserId = 20L;
+            FmUser reportedUser = TestDataFactory.createBuyer(reportedUserId, "badbuyer");
+            when(userMapper.selectById(reportedUserId)).thenReturn(reportedUser);
+
+            ComplaintCreateRequest req = new ComplaintCreateRequest();
+            req.setReportedUserId(reportedUserId);
+            req.setTitle("Buyer is abusing return policy");
+            req.setContent("Buyer returned damaged goods");
+
+            ComplaintVO result = complaintService.createComplaint(userId, req);
+
+            assertThat(result.getTitle()).isEqualTo("Buyer is abusing return policy");
+            assertThat(result.getStatus()).isEqualTo(ComplaintStatusEnum.PENDING.getCode());
+            assertThat(result.getReportedUserName()).isEqualTo("badbuyer_nick");
+            assertThat(result.getStoreName()).isNull();
+        }
+
+        @Test
+        @DisplayName("should_throw_when_neither_store_id_nor_reported_user_id_provided")
+        void shouldThrow_whenNeitherStoreIdNorReportedUserIdProvided() {
+            ComplaintCreateRequest req = new ComplaintCreateRequest();
+            req.setTitle("No target");
+            req.setContent("Content without target");
+
+            assertThatThrownBy(() -> complaintService.createComplaint(userId, req))
+                    .isInstanceOf(BusinessException.class)
+                    .extracting("code")
+                    .isEqualTo(BizCodeEnum.BAD_REQUEST.getCode());
+        }
     }
 
     @Nested

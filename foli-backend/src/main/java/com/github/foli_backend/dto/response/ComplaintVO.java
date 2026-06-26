@@ -32,6 +32,12 @@ public class ComplaintVO {
     @Schema(description = "店铺名称 Store name")
     private String storeName;
 
+    @Schema(description = "被投诉用户ID Reported user ID")
+    private Long reportedUserId;
+
+    @Schema(description = "被投诉用户名称 Reported user name")
+    private String reportedUserName;
+
     @Schema(description = "关联退货ID Related return ID")
     private Long returnId;
 
@@ -75,6 +81,7 @@ public class ComplaintVO {
         vo.setOrderId(c.getOrderId());
         vo.setProductId(c.getProductId());
         vo.setStoreId(c.getStoreId());
+        vo.setReportedUserId(c.getReportedUserId());
         vo.setReturnId(c.getReturnId());
         vo.setType(c.getType());
         vo.setTitle(c.getTitle());
@@ -144,6 +151,22 @@ public class ComplaintVO {
 
     public void setStoreName(String storeName) {
         this.storeName = storeName;
+    }
+
+    public Long getReportedUserId() {
+        return reportedUserId;
+    }
+
+    public void setReportedUserId(Long reportedUserId) {
+        this.reportedUserId = reportedUserId;
+    }
+
+    public String getReportedUserName() {
+        return reportedUserName;
+    }
+
+    public void setReportedUserName(String reportedUserName) {
+        this.reportedUserName = reportedUserName;
     }
 
     public Long getReturnId() {

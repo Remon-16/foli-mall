@@ -186,7 +186,8 @@ CREATE TABLE IF NOT EXISTS fm_complaint (
     user_id         BIGINT       NOT NULL COMMENT '投诉人用户ID Complainant (buyer) user ID',
     order_id        BIGINT       DEFAULT NULL COMMENT '关联订单ID Related order ID (nullable)',
     product_id      BIGINT       DEFAULT NULL COMMENT '关联商品ID Related product ID (nullable)',
-    store_id        BIGINT       NOT NULL COMMENT '被投诉店铺ID Target store ID',
+    store_id        BIGINT       DEFAULT NULL COMMENT '被投诉店铺ID Target store ID (nullable for seller→buyer complaints)',
+    reported_user_id BIGINT      DEFAULT NULL COMMENT '被投诉用户ID (卖家投诉买家时使用) Reported user ID (for seller→buyer complaints)',
     return_id       BIGINT       DEFAULT NULL COMMENT '关联退货单ID (退货争议) Related return ID (for return disputes)',
     type            VARCHAR(50)  DEFAULT NULL COMMENT '投诉类型 product_quality/service/delivery/fraud/return_dispute/other Complaint type',
     title           VARCHAR(200) NOT NULL COMMENT '投诉标题 Complaint title',
@@ -201,7 +202,7 @@ CREATE TABLE IF NOT EXISTS fm_complaint (
     update_time      TIMESTAMP    DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '更新时间 updateTime',
     is_delete        TINYINT      DEFAULT 0 NOT NULL COMMENT '是否删除 0=否 1=是 isDelete'
 );
-COMMENT ON TABLE fm_complaint IS '投诉表 买家投诉卖家/商品/订单/退货 Complaints filed against stores/products/orders/returns';
+COMMENT ON TABLE fm_complaint IS '投诉表 买家投诉店铺/卖家投诉用户 Complaints against stores or users';
 
 -- -----------------------------------------------------------
 -- 11. 退货退款表 Return / Refund

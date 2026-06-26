@@ -114,8 +114,7 @@ public class StoreController {
      */
     @PostMapping
     @RequireLogin
-    @RequireRole(RoleConstants.SELLER)
-    @Operation(summary = "申请开店", description = "卖家申请创建新店铺 Seller applies to create a new store")
+    @Operation(summary = "申请开店", description = "用户申请创建新店铺（买家自动升级为卖家）Apply to create a new store (buyers auto-upgrade to seller)")
     public Result<StoreVO> applyStore(
             @Valid @RequestBody StoreApplyRequest req) {
         Long userId = UserContext.getUserId();

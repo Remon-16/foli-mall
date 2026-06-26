@@ -23,6 +23,8 @@ public class FmComplaint implements Serializable {
 
     private Long storeId;
 
+    private Long reportedUserId;
+
     private Long returnId;
 
     private String type;
@@ -93,6 +95,14 @@ public class FmComplaint implements Serializable {
 
     public void setStoreId(Long storeId) {
         this.storeId = storeId;
+    }
+
+    public Long getReportedUserId() {
+        return reportedUserId;
+    }
+
+    public void setReportedUserId(Long reportedUserId) {
+        this.reportedUserId = reportedUserId;
     }
 
     public Long getReturnId() {

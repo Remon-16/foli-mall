@@ -1,7 +1,6 @@
 package com.github.foli_backend.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
@@ -10,9 +9,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "创建投诉请求 Create complaint request")
 public class ComplaintCreateRequest {
 
-    @Schema(description = "被投诉店铺ID Store ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "店铺ID不能为空 Store ID cannot be null")
+    @Schema(description = "被投诉店铺ID Store ID (optional, required if reportedUserId is null)")
     private Long storeId;
+
+    @Schema(description = "被投诉用户ID Reported user ID (for seller complaints against buyers)")
+    private Long reportedUserId;
 
     @Schema(description = "关联订单ID Related order ID (optional)")
     private Long orderId;
@@ -45,6 +46,14 @@ public class ComplaintCreateRequest {
 
     public void setStoreId(Long storeId) {
         this.storeId = storeId;
+    }
+
+    public Long getReportedUserId() {
+        return reportedUserId;
+    }
+
+    public void setReportedUserId(Long reportedUserId) {
+        this.reportedUserId = reportedUserId;
     }
 
     public Long getOrderId() {
