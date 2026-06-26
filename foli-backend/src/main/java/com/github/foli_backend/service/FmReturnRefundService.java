@@ -105,9 +105,10 @@ public interface FmReturnRefundService {
      * 平台仲裁争议 Admin: handle dispute
      *
      * @param returnId 退货ID return ID
-     * @param result   处理结果 handle result
+     * @param decision 处理决策 refund=同意退款 / reject=驳回退款
+     * @param result   处理意见 handle result
      */
-    void handleDispute(Long returnId, String result);
+    void handleDispute(Long returnId, String decision, String result);
 
     /**
      * 买家争议申诉（卖家驳回后）Buyer disputes rejected return

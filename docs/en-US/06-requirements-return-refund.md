@@ -1,6 +1,6 @@
 # Requirements Specification — Return & Refund
 
-**Doc No**: FOLI-REQ-006 | **Version**: 2.0.0 | **Date**: 2026-06-24
+**Doc No**: FOLI-REQ-006 | **Version**: 2.3.0 | **Date**: 2026-06-24
 **Related Modules**: ReturnRefundController, FmReturnRefundServiceImpl
 
 ---
@@ -13,6 +13,7 @@
 | 2.0.0 | 2026-06-24 | Enterprise format restructure | Dev Team |
 | 2.1.0 | 2026-06-26 | Added seller complaint against buyer | Dev Team |
 | 2.2.0 | 2026-06-26 | Added buyer dispute appeal (after seller rejection) | Dev Team |
+| 2.3.0 | 2026-06-26 | Admin arbitration can reject refund | Dev Team |
 
 ---
 
@@ -26,7 +27,7 @@
 | Return & refund | returnType=1; buyer ships back → seller inspects → refund |
 | Return number | Format: RT + yyyyMMdd + 6 random digits, globally unique |
 | Dispute | Seller disputes returned goods during inspection, or buyer disputes seller's rejection; auto-creates a complaint |
-| Arbitration | Admin rules on a disputed return; current implementation always refunds |
+| Arbitration | Admin rules on a disputed return; can approve refund or reject |
 
 ### 2.2 Permissions
 
@@ -63,7 +64,8 @@
   │  Pending Review   │
   └──┬───────┬───────┘
      │       │
-     │       └── REJECTED(2) → buyerDispute → DISPUTED(7) → handleDispute → REFUNDED(6)
+     │       └── REJECTED(2) → buyerDispute → DISPUTED(7) → handleDispute(refund) → REFUNDED(6)
+	     │                                               └→ handleDispute(reject) → REJECTED(2)
      │
   APPROVED(1)
      │
@@ -83,7 +85,8 @@
      │     (4)      │
      └──┬───────┬───┘
         │       │
-        │       └── dispute → DISPUTED(7) → handleDispute → REFUNDED(6)
+        │       └── dispute → DISPUTED(7) → handleDispute(refund) → REFUNDED(6)
+	        │                                 └→ handleDispute(reject) → REJECTED(2)
         │
         └── inspectPass → REFUNDED(6)
 
@@ -114,7 +117,8 @@
 | Confirm receipt | Seller | BUYER_SHIPPING(3) | SELLER_RECEIVED(4) | — |
 | Inspect pass | Seller | SELLER_RECEIVED(4) | REFUNDED(6) | Refund + record inspectTime |
 | Dispute | Seller | SELLER_RECEIVED(4) | DISPUTED(7) | Auto-create complaint |
-| Arbitrate | Admin | DISPUTED(7) | REFUNDED(6) | Refund (always refunds) |
+| Arbitrate (approve) | Admin | DISPUTED(7) | REFUNDED(6) | Refund to buyer |
+| Arbitrate (reject) | Admin | DISPUTED(7) | REJECTED(2) | No refund, uphold rejection |
 
 **Errors**: RETURN_NOT_FOUND(208001) / FORBIDDEN(200003) / WRONG_RETURN_STATUS(208002) / RETURN_ALREADY_PROCESSED(208003)
 
@@ -126,7 +130,7 @@
 
 When dispute is filed: return→DISPUTED(7) + auto-create Complaint(type=return_dispute, status=PENDING, linked via returnId). Admin handles complaint and arbitrates return.
 
-**Known limitation**: Complaint not auto-updated after arbitration; admin cannot deny refund.
+**Known limitation**: Complaint not auto-updated after arbitration.
 
 ---
 

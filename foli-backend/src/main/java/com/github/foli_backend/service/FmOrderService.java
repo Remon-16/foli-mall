@@ -4,20 +4,22 @@ import com.github.foli_backend.common.PageResult;
 import com.github.foli_backend.dto.request.OrderCreateRequest;
 import com.github.foli_backend.dto.response.OrderVO;
 
+import java.util.List;
+
 /**
  * 订单服务接口 / Order service interface
  */
 public interface FmOrderService {
 
     /**
-     * 创建订单 从用户选中的购物车项创建订单, 扣减余额, 扣减库存, 记录余额日志
-     * Create order from selected cart items, deduct balance, deduct stock, record balance log
+     * 创建订单 从用户选中的购物车项创建订单（按店铺拆分）, 扣减余额, 扣减库存, 记录余额日志
+     * Create orders from selected cart items (split by store), deduct balance, deduct stock, record balance log
      *
      * @param userId 用户ID user ID
      * @param req    创建请求 create request
-     * @return 订单视图 order view object
+     * @return 订单视图列表 order view object list
      */
-    OrderVO createOrder(Long userId, OrderCreateRequest req);
+    List<OrderVO> createOrder(Long userId, OrderCreateRequest req);
 
     /**
      * 买家订单列表 Buyer's order list

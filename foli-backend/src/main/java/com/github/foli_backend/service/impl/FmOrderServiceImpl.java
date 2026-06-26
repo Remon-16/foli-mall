@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,7 +62,7 @@ public class FmOrderServiceImpl implements FmOrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OrderVO createOrder(Long userId, OrderCreateRequest req) {
+    public List<OrderVO> createOrder(Long userId, OrderCreateRequest req) {
         List<FmCartItem> selectedItems = cartItemMapper.selectList(
                 new LambdaQueryWrapper<FmCartItem>()
                         .eq(FmCartItem::getUserId, userId)
@@ -70,8 +73,10 @@ public class FmOrderServiceImpl implements FmOrderService {
             BizCodeEnum.CART_EMPTY.throwEx();
         }
 
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        Long storeId = null;
+        // Phase 1: 验证商品并分组 / Validate products and group by store
+        Map<Long, List<FmCartItem>> groupedByStore = new LinkedHashMap<>();
+        Map<Long, FmProduct> productCache = new HashMap<>();
+        BigDecimal grandTotal = BigDecimal.ZERO;
 
         for (FmCartItem cartItem : selectedItems) {
             FmProduct product = productMapper.selectById(cartItem.getProductId());
@@ -85,16 +90,15 @@ public class FmOrderServiceImpl implements FmOrderService {
                 BizCodeEnum.INSUFFICIENT_STOCK.throwEx(": " + product.getName());
             }
 
-            if (storeId == null) {
-                storeId = product.getStoreId();
-            }
+            productCache.put(cartItem.getProductId(), product);
+            groupedByStore.computeIfAbsent(product.getStoreId(), k -> new ArrayList<>()).add(cartItem);
 
-            totalAmount = totalAmount.add(
+            grandTotal = grandTotal.add(
                     product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()))
             );
         }
 
-        // 原子扣减库存
+        // Phase 2: 原子扣减库存 / Atomic stock deduction
         for (FmCartItem cartItem : selectedItems) {
             int affected = productMapper.update(null,
                     new LambdaUpdateWrapper<FmProduct>()
@@ -107,79 +111,97 @@ public class FmOrderServiceImpl implements FmOrderService {
             }
         }
 
-        // 扣减买家余额
+        // Phase 3: 原子扣减余额（一次性扣总金额）/ Atomic balance deduction (once for grand total)
         FmUser buyer = userMapper.selectById(userId);
-        if (buyer.getBalance() == null || buyer.getBalance().compareTo(totalAmount) < 0) {
+        if (buyer.getBalance() == null || buyer.getBalance().compareTo(grandTotal) < 0) {
             BizCodeEnum.INSUFFICIENT_BALANCE.throwEx();
         }
 
         BigDecimal beforeBalance = buyer.getBalance();
         int balanceAffected = userMapper.update(null,
                 new LambdaUpdateWrapper<FmUser>()
-                        .setSql("balance = balance - " + totalAmount)
-                        .ge(FmUser::getBalance, totalAmount)
+                        .setSql("balance = balance - " + grandTotal)
+                        .ge(FmUser::getBalance, grandTotal)
                         .eq(FmUser::getId, userId)
         );
         if (balanceAffected == 0) {
             BizCodeEnum.BALANCE_DEDUCTION_FAILED.throwEx();
         }
-        BigDecimal afterBalance = beforeBalance.subtract(totalAmount);
 
-        // 创建订单
-        FmOrder order = new FmOrder();
-        order.setOrderNo(generateOrderNo());
-        order.setUserId(userId);
-        order.setStoreId(storeId);
-        order.setTotalAmount(totalAmount);
-        order.setStatus(OrderStatusEnum.PAID.getCode());
-        order.setReceiverName(req.getReceiverName());
-        order.setReceiverPhone(req.getReceiverPhone());
-        order.setReceiverAddress(req.getReceiverAddress());
-        order.setPayTime(LocalDateTime.now());
-        orderMapper.insert(order);
+        // Phase 4: 按店铺创建订单 / Create orders per store
+        BigDecimal runningBalance = beforeBalance;
+        List<OrderVO> resultList = new ArrayList<>();
 
-        // 创建订单项
-        for (FmCartItem cartItem : selectedItems) {
-            FmProduct product = productMapper.selectById(cartItem.getProductId());
+        for (Map.Entry<Long, List<FmCartItem>> entry : groupedByStore.entrySet()) {
+            Long storeId = entry.getKey();
+            List<FmCartItem> storeItems = entry.getValue();
 
-            FmOrderItem orderItem = new FmOrderItem();
-            orderItem.setOrderId(order.getId());
-            orderItem.setProductId(cartItem.getProductId());
-            orderItem.setProductName(product.getName());
-            orderItem.setProductImage(product.getMainImage());
-            orderItem.setPrice(product.getPrice());
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItemMapper.insert(orderItem);
+            BigDecimal storeSubtotal = BigDecimal.ZERO;
+            for (FmCartItem cartItem : storeItems) {
+                FmProduct product = productCache.get(cartItem.getProductId());
+                storeSubtotal = storeSubtotal.add(
+                        product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()))
+                );
+            }
 
-            productMapper.update(null,
-                    new LambdaUpdateWrapper<FmProduct>()
-                            .setSql("sales_count = sales_count + " + cartItem.getQuantity())
-                            .eq(FmProduct::getId, cartItem.getProductId())
-            );
+            FmOrder order = new FmOrder();
+            order.setOrderNo(generateOrderNo());
+            order.setUserId(userId);
+            order.setStoreId(storeId);
+            order.setTotalAmount(storeSubtotal);
+            order.setStatus(OrderStatusEnum.PAID.getCode());
+            order.setReceiverName(req.getReceiverName());
+            order.setReceiverPhone(req.getReceiverPhone());
+            order.setReceiverAddress(req.getReceiverAddress());
+            order.setPayTime(LocalDateTime.now());
+            orderMapper.insert(order);
+
+            for (FmCartItem cartItem : storeItems) {
+                FmProduct product = productCache.get(cartItem.getProductId());
+
+                FmOrderItem orderItem = new FmOrderItem();
+                orderItem.setOrderId(order.getId());
+                orderItem.setProductId(cartItem.getProductId());
+                orderItem.setProductName(product.getName());
+                orderItem.setProductImage(product.getMainImage());
+                orderItem.setPrice(product.getPrice());
+                orderItem.setQuantity(cartItem.getQuantity());
+                orderItemMapper.insert(orderItem);
+
+                productMapper.update(null,
+                        new LambdaUpdateWrapper<FmProduct>()
+                                .setSql("sales_count = sales_count + " + cartItem.getQuantity())
+                                .eq(FmProduct::getId, cartItem.getProductId())
+                );
+            }
+
+            BigDecimal afterBalance = runningBalance.subtract(storeSubtotal);
+            FmBalanceLog balanceLog = new FmBalanceLog();
+            balanceLog.setUserId(userId);
+            balanceLog.setAmount(storeSubtotal.negate());
+            balanceLog.setType(BalanceLogTypeEnum.PAY.name());
+            balanceLog.setOrderNo(order.getOrderNo());
+            balanceLog.setBeforeBalance(runningBalance);
+            balanceLog.setAfterBalance(afterBalance);
+            balanceLog.setRemark("订单支付 Order payment: " + order.getOrderNo());
+            balanceLogMapper.insert(balanceLog);
+
+            runningBalance = afterBalance;
+
+            OrderVO vo = OrderVO.fromEntity(order);
+            FmStore store = storeMapper.selectById(storeId);
+            vo.setStoreName(store != null ? store.getStoreName() : null);
+            resultList.add(vo);
         }
 
-        // 记录余额日志
-        FmBalanceLog balanceLog = new FmBalanceLog();
-        balanceLog.setUserId(userId);
-        balanceLog.setAmount(totalAmount.negate());
-        balanceLog.setType(BalanceLogTypeEnum.PAY.name());
-        balanceLog.setOrderNo(order.getOrderNo());
-        balanceLog.setBeforeBalance(beforeBalance);
-        balanceLog.setAfterBalance(afterBalance);
-        balanceLog.setRemark("订单支付 Order payment: " + order.getOrderNo());
-        balanceLogMapper.insert(balanceLog);
-
-        // 清空已选中购物车项
+        // Phase 5: 清空已选中购物车项 / Clear selected cart items
         cartItemMapper.delete(
                 new LambdaUpdateWrapper<FmCartItem>()
                         .eq(FmCartItem::getUserId, userId)
                         .eq(FmCartItem::getSelected, 1)
         );
 
-        OrderVO vo = OrderVO.fromEntity(order);
-        FmStore store = storeMapper.selectById(storeId);
-        vo.setStoreName(store != null ? store.getStoreName() : null);
-        return vo;
+        return resultList;
     }
 
     @Override

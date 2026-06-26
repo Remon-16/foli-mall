@@ -178,14 +178,18 @@ public class AdminController {
      * 平台仲裁争议 Admin handle dispute
      */
     @PutMapping("/returns/{id}/handle-dispute")
-    @Operation(summary = "平台仲裁争议 Handle dispute", description = "管理员对争议中的退货进行仲裁 Admin arbitrates disputed returns")
+    @Operation(summary = "平台仲裁争议 Handle dispute", description = "管理员对争议中的退货进行仲裁，可选择同意退款或驳回 Admin arbitrates disputed returns, can approve refund or reject")
     public Result<Void> handleDispute(@Parameter(description = "退货ID Return ID") @PathVariable Long id,
                                        @RequestBody Map<String, String> body) {
-        String result = body.get("result");
-        if (result == null || result.isBlank()) {
-            BizCodeEnum.BAD_REQUEST.throwEx("处理结果不能为空 Handle result cannot be blank");
+        String decision = body.get("decision");
+        if (decision == null || decision.isBlank()) {
+            BizCodeEnum.BAD_REQUEST.throwEx("处理决策不能为空 Decision cannot be blank");
         }
-        returnRefundService.handleDispute(id, result);
+        if (!"refund".equals(decision) && !"reject".equals(decision)) {
+            BizCodeEnum.BAD_REQUEST.throwEx("处理决策必须为 refund 或 reject Decision must be refund or reject");
+        }
+        String result = body.getOrDefault("result", "");
+        returnRefundService.handleDispute(id, decision, result);
         return Result.success();
     }
 

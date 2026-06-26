@@ -104,14 +104,16 @@ class FmOrderServiceImplTest {
             req.setReceiverAddress("Beijing");
 
             // when
-            OrderVO result = orderService.createOrder(buyerId, req);
+            List<OrderVO> result = orderService.createOrder(buyerId, req);
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.getOrderNo()).startsWith("FO");
-            assertThat(result.getStatus()).isEqualTo(OrderStatusEnum.PAID.getCode());
-            assertThat(result.getStoreName()).isEqualTo("Test Store 10");
-            assertThat(result.getTotalAmount()).isEqualByComparingTo(
+            assertThat(result).hasSize(1);
+            OrderVO vo = result.get(0);
+            assertThat(vo.getOrderNo()).startsWith("FO");
+            assertThat(vo.getStatus()).isEqualTo(OrderStatusEnum.PAID.getCode());
+            assertThat(vo.getStoreName()).isEqualTo("Test Store 10");
+            assertThat(vo.getTotalAmount()).isEqualByComparingTo(
                     price1.multiply(BigDecimal.valueOf(2)).add(price2));
 
             // verify stock deducted (2 stock deductions + 2 sales_count increments)
@@ -126,6 +128,8 @@ class FmOrderServiceImplTest {
             verify(balanceLogMapper).insert(any(FmBalanceLog.class));
             // verify cart cleared
             verify(cartItemMapper).delete(any(LambdaUpdateWrapper.class));
+            // verify store lookup
+            verify(storeMapper).selectById(storeId);
         }
 
         @Test
@@ -338,8 +342,9 @@ class FmOrderServiceImplTest {
 
             OrderCreateRequest req = new OrderCreateRequest();
 
-            orderService.createOrder(buyerId, req);
+            List<OrderVO> result = orderService.createOrder(buyerId, req);
 
+            assertThat(result).hasSize(1);
             // 1 stock deduction + 1 sales_count increment = 2 calls
             verify(productMapper, times(2)).update(isNull(), any(LambdaUpdateWrapper.class));
         }
@@ -366,9 +371,71 @@ class FmOrderServiceImplTest {
 
             OrderCreateRequest req = new OrderCreateRequest();
 
-            OrderVO result = orderService.createOrder(buyerId, req);
+            List<OrderVO> result = orderService.createOrder(buyerId, req);
 
-            assertThat(result.getStoreName()).isNull();
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getStoreName()).isNull();
+        }
+
+        @Test
+        @DisplayName("should_create_multiple_orders_when_cart_items_from_different_stores")
+        void shouldCreateMultipleOrders_whenCartItemsFromDifferentStores() {
+            Long storeIdA = 10L;
+            Long storeIdB = 20L;
+            FmProduct productA = TestDataFactory.createApprovedProduct(productId1, storeIdA, 10, price1);
+            FmProduct productB = TestDataFactory.createApprovedProduct(productId2, storeIdB, 5, price2);
+            FmCartItem cartItemA = TestDataFactory.createSelectedCartItem(1L, buyerId, productId1, 2);
+            FmCartItem cartItemB = TestDataFactory.createSelectedCartItem(2L, buyerId, productId2, 1);
+            FmUser buyer = TestDataFactory.createBuyer(buyerId, "buyer1");
+            buyer.setBalance(BigDecimal.valueOf(5000));
+            FmStore storeA = TestDataFactory.createApprovedStore(storeIdA, 2L);
+            FmStore storeB = TestDataFactory.createApprovedStore(storeIdB, 3L);
+
+            when(cartItemMapper.selectList(any(LambdaQueryWrapper.class)))
+                    .thenReturn(List.of(cartItemA, cartItemB));
+            when(productMapper.selectById(productId1)).thenReturn(productA);
+            when(productMapper.selectById(productId2)).thenReturn(productB);
+            when(productMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
+            when(userMapper.selectById(buyerId)).thenReturn(buyer);
+            when(userMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
+            when(orderMapper.insert(any(FmOrder.class))).thenReturn(1);
+            when(orderItemMapper.insert(any(FmOrderItem.class))).thenReturn(1);
+            when(balanceLogMapper.insert(any(FmBalanceLog.class))).thenReturn(1);
+            when(cartItemMapper.delete(any(LambdaUpdateWrapper.class))).thenReturn(2);
+            when(storeMapper.selectById(storeIdA)).thenReturn(storeA);
+            when(storeMapper.selectById(storeIdB)).thenReturn(storeB);
+
+            OrderCreateRequest req = new OrderCreateRequest();
+            req.setReceiverName("Zhang San");
+            req.setReceiverPhone("13800138000");
+            req.setReceiverAddress("Beijing");
+
+            List<OrderVO> result = orderService.createOrder(buyerId, req);
+
+            assertThat(result).hasSize(2);
+
+            OrderVO orderA = result.get(0);
+            assertThat(orderA.getStoreId()).isEqualTo(storeIdA);
+            assertThat(orderA.getStoreName()).isEqualTo("Test Store 10");
+            assertThat(orderA.getTotalAmount()).isEqualByComparingTo(
+                    price1.multiply(BigDecimal.valueOf(2)));
+
+            OrderVO orderB = result.get(1);
+            assertThat(orderB.getStoreId()).isEqualTo(storeIdB);
+            assertThat(orderB.getStoreName()).isEqualTo("Test Store 20");
+            assertThat(orderB.getTotalAmount()).isEqualByComparingTo(price2);
+
+            // balance deducted once for grand total
+            verify(userMapper, times(1)).update(isNull(), any(LambdaUpdateWrapper.class));
+            // two orders created
+            verify(orderMapper, times(2)).insert(any(FmOrder.class));
+            // two balance log entries (one per order)
+            verify(balanceLogMapper, times(2)).insert(any(FmBalanceLog.class));
+            // cart cleared once
+            verify(cartItemMapper, times(1)).delete(any(LambdaUpdateWrapper.class));
+            // store lookup for each store
+            verify(storeMapper, times(1)).selectById(storeIdA);
+            verify(storeMapper, times(1)).selectById(storeIdB);
         }
     }
 

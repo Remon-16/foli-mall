@@ -1,6 +1,6 @@
 # Requirements Specification — Cart & Order
 
-**Doc No**: FOLI-REQ-005 | **Version**: 2.0.0 | **Date**: 2026-06-24
+**Doc No**: FOLI-REQ-005 | **Version**: 2.1.0 | **Date**: 2026-06-26
 **Related Modules**: CartController, OrderController, FmCartItemServiceImpl, FmOrderServiceImpl
 
 ---
@@ -11,6 +11,7 @@
 |---------|------|---------|--------|
 | 1.0.0 | 2026-06-24 | Initial version | Dev Team |
 | 2.0.0 | 2026-06-24 | Enterprise format restructure | Dev Team |
+| 2.1.0 | 2026-06-26 | Split orders by store during checkout | Dev Team |
 
 ---
 
@@ -38,9 +39,9 @@
 
 ### 2.3 Scope
 
-**In scope**: Cart CRUD with dedup; one-step order+payment; optimistic lock stock & balance deduction; order lifecycle; balance log recording.
+**In scope**: Cart CRUD with dedup; one-step order+payment; per-store order splitting (multi-store cart items create separate orders, one-time balance deduction); optimistic lock stock & balance deduction; order lifecycle; balance log recording.
 
-**Out of scope**: PENDING_PAY flow (defined but not the main path — createOrder directly sets PAID); RECEIVED(3) intermediate state (SHIPPED jumps directly to COMPLETED); cross-store cart splitting.
+**Out of scope**: PENDING_PAY flow (defined but not the main path — createOrder directly sets PAID); RECEIVED(3) intermediate state (SHIPPED jumps directly to COMPLETED).
 
 ---
 
@@ -104,7 +105,7 @@ Get selected cart items → validate each: exists + APPROVED + stock>=qty
 
 **Precondition**: Logged in, cart has selected items.
 
-**Key rules**: One-step create+pay (status=PAID). Stock check: `stock >= qty` (not just `stock > 0`). Balance check: `balance >= total`. Both use optimistic locking — if affected rows=0, throw failure.
+**Key rules**: Group cart items by storeId, create one order per store. One-step create+pay (status=PAID). Stock check: `stock >= qty` (not just `stock > 0`). Balance check: `balance >= total`. Both use optimistic locking — if affected rows=0, throw failure.
 
 **Errors**: CART_EMPTY(207001) / INSUFFICIENT_STOCK(203002) / STOCK_DEDUCTION_FAILED(203003) / INSUFFICIENT_BALANCE(205001) / BALANCE_DEDUCTION_FAILED(205002)
 

@@ -207,10 +207,10 @@ H2 控制台：<http://localhost:8080/h2-console>（JDBC URL: `jdbc:h2:mem:foli_
   │     → 卖家确认收货 → status=4（卖家已收货）   ← 投诉用户按钮出现
   │       ├─ 卖家验货通过 → status=6（已退款）
   │       └─ 卖家验货不通过/发起争议 → status=7（已争议） ← 投诉用户按钮出现
-  │           → 管理员仲裁 → status=6（已退款）
+  │           → 管理员仲裁 → 同意退款(status=6) 或 驳回退款(status=2)
   └─ 卖家驳回 → status=2（已驳回）
       → 买家争议申诉 → status=7（已争议）
-          → 管理员仲裁 → status=6（已退款）
+          → 管理员仲裁 → 同意退款(status=6) 或 驳回退款(status=2)
 ```
 
 - status=5（INSPECTING）已定义但当前未使用

@@ -32,8 +32,6 @@
     <a-modal
       v-model:open="detailModalOpen"
       :title="t('admin.returnDispute')"
-      @ok="handleDispute"
-      :confirm-loading="submitting"
       width="640px"
     >
       <a-descriptions bordered :column="1" v-if="currentReturn">
@@ -51,10 +49,25 @@
       <a-divider />
 
       <a-form layout="vertical">
-        <a-form-item :label="t('return.adminResult')" required>
+        <a-form-item :label="t('return.adminResult')">
           <a-textarea v-model:value="adminResult" :rows="4" :placeholder="t('return.adminResult')" />
         </a-form-item>
       </a-form>
+
+      <template #footer>
+        <a-button @click="detailModalOpen = false">{{ t('common.cancel') }}</a-button>
+        <a-popconfirm
+          :title="t('admin.rejectRefundConfirm')"
+          @confirm="handleDispute('reject')"
+        >
+          <a-button type="primary" danger :loading="submitting">
+            {{ t('admin.rejectRefund') }}
+          </a-button>
+        </a-popconfirm>
+        <a-button type="primary" @click="handleDispute('refund')" :loading="submitting">
+          {{ t('admin.approveRefund') }}
+        </a-button>
+      </template>
     </a-modal>
   </div>
 </template>
@@ -115,14 +128,11 @@ function openDetailModal(record: ReturnRefundVO) {
   detailModalOpen.value = true
 }
 
-async function handleDispute() {
-  if (!adminResult.value.trim()) {
-    message.warning(t('return.adminResult'))
-    return
-  }
+async function handleDispute(decision: string) {
   submitting.value = true
   try {
     await service.put(`/admin/returns/${currentReturn.value!.id}/handle-dispute`, {
+      decision,
       result: adminResult.value,
     })
     message.success(t('common.success'))

@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 订单控制器 / Order controller
  */
@@ -31,11 +33,11 @@ public class OrderController {
      * 创建订单 Create order from selected cart items
      */
     @PostMapping
-    @Operation(summary = "创建订单 Create order")
-    public Result<OrderVO> createOrder(@Valid @RequestBody OrderCreateRequest req) {
+    @Operation(summary = "创建订单 Create order (split by store)")
+    public Result<List<OrderVO>> createOrder(@Valid @RequestBody OrderCreateRequest req) {
         Long userId = UserContext.getUserId();
-        OrderVO vo = orderService.createOrder(userId, req);
-        return Result.success(vo);
+        List<OrderVO> voList = orderService.createOrder(userId, req);
+        return Result.success(voList);
     }
 
     /**

@@ -293,7 +293,7 @@ public class FmReturnRefundServiceImpl implements FmReturnRefundService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void handleDispute(Long returnId, String result) {
+    public void handleDispute(Long returnId, String decision, String result) {
         FmReturnRefund returnRefund = returnRefundMapper.selectById(returnId);
         if (returnRefund == null) {
             BizCodeEnum.RETURN_NOT_FOUND.throwEx();
@@ -302,11 +302,14 @@ public class FmReturnRefundServiceImpl implements FmReturnRefundService {
             BizCodeEnum.WRONG_RETURN_STATUS.throwEx();
         }
 
-        doRefund(returnRefund);
-
-        returnRefund.setStatus(ReturnRefundStatusEnum.REFUNDED.getCode());
+        if ("refund".equals(decision)) {
+            doRefund(returnRefund);
+            returnRefund.setStatus(ReturnRefundStatusEnum.REFUNDED.getCode());
+            returnRefund.setRefundTime(LocalDateTime.now());
+        } else {
+            returnRefund.setStatus(ReturnRefundStatusEnum.REJECTED.getCode());
+        }
         returnRefund.setAdminHandleResult(result);
-        returnRefund.setRefundTime(LocalDateTime.now());
         returnRefundMapper.updateById(returnRefund);
     }
 

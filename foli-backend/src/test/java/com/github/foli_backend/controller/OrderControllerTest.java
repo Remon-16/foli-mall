@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -57,14 +58,14 @@ class OrderControllerTest {
         vo.setId(1L);
         vo.setOrderNo("FO20260625000001");
         vo.setTotalAmount(BigDecimal.valueOf(99));
-        when(orderService.createOrder(anyLong(), any())).thenReturn(vo);
+        when(orderService.createOrder(anyLong(), any())).thenReturn(List.of(vo));
 
         mockMvc.perform(post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"receiverName\":\"Test\",\"receiverPhone\":\"13800138000\",\"receiverAddress\":\"Beijing\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("100000"))
-                .andExpect(jsonPath("$.data.orderNo").value("FO20260625000001"));
+                .andExpect(jsonPath("$.data[0].orderNo").value("FO20260625000001"));
     }
 
     @Test

@@ -445,10 +445,26 @@ class FmReturnRefundServiceImplTest {
             when(balanceLogMapper.insert(any(FmBalanceLog.class))).thenReturn(1);
             when(returnRefundMapper.updateById(any(FmReturnRefund.class))).thenReturn(1);
 
-            returnService.handleDispute(1L, "Refund approved by admin");
+            returnService.handleDispute(1L, "refund", "Refund approved by admin");
 
             assertThat(rr.getStatus()).isEqualTo(ReturnRefundStatusEnum.REFUNDED.getCode());
             assertThat(rr.getAdminHandleResult()).isEqualTo("Refund approved by admin");
+        }
+
+        @Test
+        @DisplayName("should_reject_dispute_and_not_refund_when_decision_is_reject")
+        void shouldRejectDisputeAndNotRefund_whenDecisionIsReject() {
+            FmReturnRefund rr = TestDataFactory.createReturnRefund(1L, orderId, buyerId, storeId,
+                    ReturnRefundStatusEnum.DISPUTED.getCode(), 1, refundAmount);
+            when(returnRefundMapper.selectById(1L)).thenReturn(rr);
+            when(returnRefundMapper.updateById(any(FmReturnRefund.class))).thenReturn(1);
+
+            returnService.handleDispute(1L, "reject", "Dispute rejected by admin");
+
+            assertThat(rr.getStatus()).isEqualTo(ReturnRefundStatusEnum.REJECTED.getCode());
+            assertThat(rr.getAdminHandleResult()).isEqualTo("Dispute rejected by admin");
+            verify(userMapper, never()).update(isNull(), any(LambdaUpdateWrapper.class));
+            verify(balanceLogMapper, never()).insert(any(FmBalanceLog.class));
         }
 
         @Test
@@ -457,7 +473,7 @@ class FmReturnRefundServiceImplTest {
             FmReturnRefund rr = TestDataFactory.createPendingReturn(1L, orderId, buyerId, storeId, 0, refundAmount);
             when(returnRefundMapper.selectById(1L)).thenReturn(rr);
 
-            assertThatThrownBy(() -> returnService.handleDispute(1L, "result"))
+            assertThatThrownBy(() -> returnService.handleDispute(1L, "refund", "result"))
                     .isInstanceOf(BusinessException.class)
                     .extracting("code")
                     .isEqualTo(BizCodeEnum.WRONG_RETURN_STATUS.getCode());
