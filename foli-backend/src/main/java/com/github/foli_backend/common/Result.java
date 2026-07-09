@@ -29,12 +29,12 @@ public class Result<T> {
 
     /** 成功 success */
     public static <T> Result<T> success(T data) {
-        return new Result<>(BizCodeEnum.SUCCESS.getCode(), "success", data);
+        return new Result<>(BizCodeEnum.SUCCESS.getCode(), BizCodeEnum.SUCCESS.getDefaultMessage(), data);
     }
 
     /** 成功 无数据 success without data */
     public static <T> Result<T> success() {
-        return new Result<>(BizCodeEnum.SUCCESS.getCode(), "success", null);
+        return new Result<>(BizCodeEnum.SUCCESS.getCode(), BizCodeEnum.SUCCESS.getDefaultMessage(), null);
     }
 
     /** 成功 自定义消息 success with custom message */
