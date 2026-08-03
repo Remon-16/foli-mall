@@ -49,7 +49,6 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		<!-- Knife4j API 文档 OpenAPI 3.0 Jakarta API documentation -->
 		<dependency>

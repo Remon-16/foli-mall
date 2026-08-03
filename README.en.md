@@ -68,6 +68,14 @@ npm run dev
 
 After startup, visit: <http://localhost:5173>
 
+### Integration with Flow Forge
+
+The backend starts an H2 TCP Server on boot (default port 9092) so external tools can share the same H2 in-memory database. Flow Forge database processors can connect directly with:
+
+`jdbc:h2:tcp://localhost:9092/mem:foli_mall;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false`
+
+Run `python tools/h2/init_h2.py` in the Flow Forge repo to download the H2 JDBC jar, then run Flow Forge cases. The switch and port can be configured via `app.h2.tcp.enabled` / `app.h2.tcp.port`. Note: H2 is an in-memory database and loses all data on restart; start this backend before running Flow Forge cases.
+
 ## Test Accounts
 
 | Username | Password | Role | Balance |

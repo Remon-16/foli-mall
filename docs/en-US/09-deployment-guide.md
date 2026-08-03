@@ -242,6 +242,10 @@ The backend has CORS enabled for all `/api/**` paths with the following settings
 | `jwt.secret` | `foli-mall-secret-key-2026-...` | JWT signing secret |
 | `jwt.expiration` | `86400000` | JWT token expiry in ms (24 hours) |
 | `app.upload.path` | `./uploads` | Local file upload directory |
+| `app.h2.tcp.enabled` | `true` | Start the H2 TCP Server on boot for external processes |
+| `app.h2.tcp.port` | `9092` | H2 TCP Server listen port |
+
+The backend starts an H2 TCP Server on boot (default port 9092) so external processes such as flow-forge database processors can share the same in-memory database. External connections use e.g. `jdbc:h2:tcp://localhost:9092/mem:foli_mall;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false`. H2 is an in-memory database and loses all data on restart.
 
 ### 6.2 Security Warning
 

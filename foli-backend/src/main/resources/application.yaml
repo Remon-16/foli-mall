@@ -57,6 +57,10 @@ jwt:
 app:
   upload:
     path: ./uploads       # 图片上传本地路径 local image upload path
+  h2:
+    tcp:
+      enabled: true       # 启动时开启 H2 TCP Server，供外部进程共享内存库 / start H2 TCP Server on boot for external processes
+      port: 9092          # H2 TCP Server 监听端口 / H2 TCP Server listen port
 
 server:
   port: 8080

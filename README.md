@@ -68,6 +68,14 @@ npm run dev
 
 启动后访问：<http://localhost:5173>
 
+### 与 Flow Forge 联调
+
+后端启动时会自动开启 H2 TCP Server（默认端口 9092），供外部工具共享同一 H2 内存库。Flow Forge 的数据库插件可直接连接：
+
+`jdbc:h2:tcp://localhost:9092/mem:foli_mall;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false`
+
+在 Flow Forge 侧运行 `python tools/h2/init_h2.py` 下载 H2 JDBC jar 后即可联调。开关与端口可通过 `app.h2.tcp.enabled` / `app.h2.tcp.port` 配置。注意：H2 为内存数据库，重启后数据清空；请先启动本后端，再运行 Flow Forge 用例。
+
 ## 测试账号
 
 | 用户名 | 密码 | 角色 | 账户余额 |
